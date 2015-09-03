@@ -7,13 +7,12 @@ interface ParserInterface
 
 class BaseNode
 {
-	protected $previous = null;
+	protected $name = "";
+	protected $previous = [];
 	protected $nexts = [];
 
-	public $registry = null;
-	protected $logger = null;
-
-	protected $parser = null;
+	protected $registry = null;
+	protected $processor = null;
 
 	protected $depth = 0;
 
@@ -21,34 +20,33 @@ class BaseNode
 	protected $output = [];
 
 
-	public function __construct(ParserInterface $parser, Registry $registry, Logger $logger)
+	public function __construct(Registry $registry, ProcessorInterface $processor, $name = "")
 	{
-		$this->parser = $parser;
 		$this->registry = $registry;
-		$this->logger = $logger;
+		$this->processor = $processor;
+		$this->name = !empty($name) ? (string)$name : (string)"node_{uniqid()}";
 	}
 	// create a piping stucture in which
 	// output of one node is input of the nexts
 	public function pipe(BaseNode $next)
 	{
-		$this->nexts[] = $next;
-		$next->previous = $this;
-		$next->depth = $this->depth + 1;
-	}
-
-	public function getData(array $input)
-	{
-		$this->input = $input;
-	}
-
-	public function parse()
-	{
-		$this->output = $this->parser->parse($this->input);
-		$this->logger->log($this->output);
-
-		foreach ($this->nexts as $node) {
-			$node->input = $this->output;
+		$maxDepth = 0;
+		foreach (func_get_args() as &$parameter) {
+			if ($parameter !instanceof BaseNode)
+				throw new Exception('parameter passed to piping is not valid');
+			$this->previous[] = $parameter;
+			$parameter->nexts[] = $this;
+			$maxDepth = ($parameter->depth > $maxDepth) ? $parameter->depth : $maxDepth;
 		}
+		$this->depth = $maxDepth + 1;
+	}
+
+	public function process()
+	{
+		foreach ($this->previous as $node) {
+			$this->input[$node->name] = &$node->output;
+		}
+		$this->output = $this->processor->process($this->input);
 	}
 
 	public function getDepth()
@@ -58,6 +56,7 @@ class BaseNode
 
 	public function register()
 	{
+		if ($this->registry->hasRegistered($this)) return;
 		$this->registry->register($this);
 		foreach ($this->nexts as $node) {
 			$node->register();
@@ -70,9 +69,14 @@ class Registry
 {
 	public $registries = [];
 
-	public function register(BaseNode $node)
+	public function register(BaseNode &$node)
 	{
 		$this->registries[$node->getDepth()][] = $node;
+	}
+
+	public function hasRegistered(BaseNode &$node)
+	{
+		return in_array($node, $this->registries[$node->getDepth()]);
 	}
 
 	public function display()
@@ -85,30 +89,9 @@ class Registry
 	public function run()
 	{
 		foreach ($this->registries as $depth) {
-			foreach ($depth as $parser) {
-				$parser->parse();
+			foreach ($depth as $node) {
+				$node->process();
 			}
 		}
 	}
-}
-
-class Logger
-{
-	public function log($output) {
-		print_r($output);
-	}
-}
-
-class Parser implements ParserInterface
-{
-	public function parse(array $input)
-	{
-		$input[] = rand();
-		return $input;
-	}
-}
-
-class UrlCrawler
-{
-	
 }

@@ -31,15 +31,16 @@ base-parser --> mono-parser --> regex-mono-parser     \
 composite pattern = wireframe (mono/multi) + parser (regex/xpath)
 
 function buildNodes(array $structure) {
+  $nodes = [];
   foreach ($structure as $option => $nextNodes) {
     $node = Node::createFromOption($option);
-    
+
     if (is_array($nextNodes)) {
       foreach ($this->buildNodes as $nextNode) {
         $node->pipe($nextNode);
       }
     }
-
+    
     
   }
 }

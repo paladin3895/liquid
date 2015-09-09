@@ -80,6 +80,11 @@ abstract class BaseNode
 		return $this->depth;
 	}
 
+	public function getName()
+	{
+		return $this->name;
+	}
+
 	public function register()
 	{
 		if ($this->registry->hasRegistered($this)) return;

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 class Registry
 {
@@ -15,7 +15,7 @@ class Registry
 
 	public function register(BaseNode &$node)
 	{
-		if ($this->hasRegistered) return;
+		if ($this->hasRegistered($node)) return;
 		else $this->getDepth($node->getDepth())->attach($node);
 	}
 
@@ -30,13 +30,9 @@ class Registry
 		return $this->getDepth($node->getDepth())->contains($node);
 	}
 
-	public function display()
-	{
-		
-	}
-
 	public function run()
 	{
+		var_dump($this->registries);
 		foreach ($this->registries as $depth) {
 			foreach ($depth as $node) {
 				$node->process();

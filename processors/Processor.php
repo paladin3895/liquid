@@ -1,4 +1,6 @@
 <?php
+require_once('ContinousProcessor.php');
+require_once('ParalelProcessor.php');
 
 abstract class Processor
 {
@@ -6,8 +8,8 @@ abstract class Processor
 
 	public function __construct(array $units)
 	{
-		foreach ($units as $unit) {
-			if ($unit !instanceof ProcessUnitInterface) throw new Exception('invalid unit passed to Processor');
+		foreach ($units as &$unit) {
+			if (!($unit instanceof ProcessUnitInterface)) throw new Exception('invalid unit passed to Processor');
 			$this->processUnits[] = $unit;
 		}
 	}

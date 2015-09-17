@@ -1,41 +1,16 @@
 <?php
-require 'parsers/ParserInterface.php';
+require_once('nodes/Node.php');
+require_once('processors/Processor.php');
+require_once('helpers/Registry.php');
+require_once('units/ProcessUnitInterface.php');
 
-$parser = new Parser();
 $registry = new Registry();
-$logger = new Logger();
+$processor = new ContinousProcessor([new OutputLogger()]);
 
-$crawler1 = new BaseNode(
-	$parser,
-	$registry,
-	$logger
-);
-
-$crawler2 = new BaseNode(
-	$parser,
-	$registry,
-	$logger
-);
-
-$crawler3 = new BaseNode(
-	$parser,
-	$registry,
-	$logger
-);
-
-$crawler4 = new BaseNode(
-	$parser,
-	$registry,
-	$logger
-);
-
-$crawler1->pipe($crawler2);
-$crawler1->pipe($crawler3);
-
-$crawler2->pipe($crawler4);
-
-$crawler1->register();
-
-$crawler1->getData(['123']);
-
-$crawler1->registry->run();
+$node1 = new Node('prototype1', $registry, $processor);
+$node2 = new Node('prototype2', $registry, $processor);
+$node3 = new Node('prototype3', $registry, $processor);
+$node1->split([$node2, $node3]);
+$node3->backward($node2);
+$node1->initialize();
+$registry->run();

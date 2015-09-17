@@ -2,6 +2,8 @@
 
 abstract class BaseNode
 {
+	public static $objectPool = [];
+
 	protected $name = "";
 	protected $previous = [];
 	protected $nexts = [];
@@ -20,36 +22,37 @@ abstract class BaseNode
 		$this->registry = $registry;
 		$this->processor = $processor;
 		$this->name = (string)$name;
+		self::$objectPool[$name] = &$this;
 	}
-	
+
 	// create a piping stucture in which
 	// output of one node is input of the nexts
-	public function forward(BaseNode $next)
+	public function forward(BaseNode &$next)
 	{
 		$this->nexts[] = $next;
 		$next->previous[] = $this;
-		$next->depth = ($next->depth >= $this->depth) ? $next->depth : ($this->depth + 1);
+		$next->depth = ($next->depth > $this->depth) ? $next->depth : ($this->depth + 1);
 	}
 
-	public function backward(BaseNode $previous)
+	public function backward(BaseNode &$previous)
 	{
 		$this->previous[] = $previous;
 		$previous->nexts[] = $this;
-		$this->depth = ($this->depth >= $previous->depth) ? $this->depth : ($previous->depth + 1)
+		$this->depth = ($this->depth > $previous->depth) ? $this->depth : ($previous->depth + 1);
 	}
 
-	public function hub(array $previous)
+	public function hub(array $previouses)
 	{
-		foreach ($previous as $node) {
-			if ($node !instanceof BaseNode) throw new Exception 'invalid node type';
+		foreach ($previouses as &$node) {
+			if (!($node instanceof BaseNode)) throw new Exception('invalid node type');
 			$this->backward($node);
 		}
 	}
 
 	public function split(array $nexts)
 	{
-		foreach ($nexts as $node) {
-			if ($node !instanceof BaseNode) throw new Exception 'invalid node type';
+		foreach ($nexts as &$node) {
+			if (!($node instanceof BaseNode)) throw new Exception('invalid node type');
 			$this->forward($node);
 		}
 	}
@@ -64,7 +67,7 @@ abstract class BaseNode
 
 	public function terminate()
 	{
-		$this->unregister();
+		// TODO: implement logic here
 	}
 
 	public function initialize()

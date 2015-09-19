@@ -5,7 +5,7 @@ abstract class BaseNode
 	public static $objectPool = [];
 
 	protected $name = "";
-	protected $previous = [];
+	protected $previouses = [];
 	protected $nexts = [];
 
 	protected $registry = null;
@@ -30,13 +30,13 @@ abstract class BaseNode
 	public function forward(BaseNode &$next)
 	{
 		$this->nexts[] = $next;
-		$next->previous[] = $this;
+		$next->previouses[] = $this;
 		$next->depth = ($next->depth > $this->depth) ? $next->depth : ($this->depth + 1);
 	}
 
 	public function backward(BaseNode &$previous)
 	{
-		$this->previous[] = $previous;
+		$this->previouses[] = $previous;
 		$previous->nexts[] = $this;
 		$this->depth = ($this->depth > $previous->depth) ? $this->depth : ($previous->depth + 1);
 	}
@@ -59,10 +59,9 @@ abstract class BaseNode
 
 	public function process()
 	{
-		foreach ($this->previous as $node) {
-			$this->input[$node->name] = &$node->output;
-		}
+		$this->_pull();
 		$this->output = $this->processor->process($this->input);
+		// $this->_push();
 	}
 
 	public function terminate()
@@ -98,5 +97,26 @@ abstract class BaseNode
 	{
 		if (!$this->registry->hasRegistered($this)) return;
 		$this->registry->unregister($this);
+	}
+
+	public function display()
+	{
+		echo '########## Node ##########<br/>';
+		echo 'name: ' . $this->name . ', depth: ' . $this->depth . '<br/>';
+	}
+
+	protected function _push()
+	{
+		foreach ($this->nexts as &$node) {
+			$node->input[$this->name] = $this->output;
+		}
+	}
+
+	protected function _pull()
+	{
+		if (empty($this->previouses)) $this->input['void'] = ['placeholder'];
+		foreach ($this->previouses as &$node) {
+			$this->input[$node->name] = $node->output;
+		}
 	}
 }

@@ -1,21 +1,20 @@
 <?php
 
-class RegexParser implements ProcessUnitInterface
+class RegexParser extends BaseUnit
 {
   protected $signature = '';
 
   public function __construct($signature) {
+    parent::__construct($signature);
     $this->signature = (string)$signature;
   }
 
-  public function process(array $input) {
+  public function process(array $record) {
     $output = [];
     $matches = [];
-    foreach ($input as $value) {
-      if (is_array($value))
-        $this->process($value);
-      elseif (preg_match($this->signature, $value, $matches))
-        $output[] = end($matches);
+    foreach ($record as $key => $value) {
+      if (preg_match($this->signature, $value, $matches))
+        $output[$key] = end($matches);
     }
     return $output;
   }

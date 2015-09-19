@@ -14,5 +14,13 @@ abstract class Processor
 		}
 	}
 
-	abstract public function process(array $input);
+	/*
+	 * $input into the processor with format
+	 * ['node_name' => ['key' => 'scalar value', ...], ...]
+	 * after process the output format ['key' => 'scalar value', ...]
+	 * which will be encapsulated into
+	 * ['node_name' => ['key' => 'scalar value', ...], ...]
+	 * at the next node to keep data format consistent
+	 */
+	abstract public function process(array $data);
 }

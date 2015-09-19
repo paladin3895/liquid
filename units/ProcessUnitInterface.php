@@ -1,8 +1,18 @@
 <?php
-require_once('OutputLogger.php');
-require_once('RegexParser.php');
 
 interface ProcessUnitInterface
 {
-	public function process(array $input);
+	/*
+	 * $input into the process unit with format
+	 * ['key' => 'scalar value', ...]
+	 * after process the output format ['key' => 'scalar value', ...]
+	 * multiple output of units will be merge into
+	 * ['key' => 'scalar value', ...]
+	 * at the processor to maintain data format consistency
+	 */
+	public function process(array $record);
+
+	public function setLabel($label);
+
+	public function getLabel();
 }

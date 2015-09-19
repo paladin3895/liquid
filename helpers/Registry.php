@@ -32,9 +32,9 @@ class Registry
 
 	public function run()
 	{
-		var_dump($this->registries);
 		foreach ($this->registries as $depth) {
 			foreach ($depth as $node) {
+				$node->display();
 				$node->process();
 			}
 		}

@@ -1,0 +1,9 @@
+<?php
+require_once('../helpers/Registry.php');
+require_once('../nodes/ExecutiveNode.php');
+require_once('../nodes/Node.php');
+require_once('../processors/ContinousProcessor.php');
+require_once('../processors/ParallelProcessor.php');
+require_once('../units/CommandTrigger.php');
+require_once('../units/DummyDataProvider.php');
+require_once('../units/InputLogger.php');

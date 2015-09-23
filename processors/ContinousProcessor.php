@@ -7,11 +7,11 @@ class ContinousProcessor extends Processor
 	{
 		$output = [];
 		foreach ($data as $label => $record) {
+			$output = array_merge($output, $record);
 			foreach ($this->processUnits as &$unit) {
 				$unit->setLabel($label);
-				$record = $unit->process($record);
+				$output = $unit->process($output);
 			}
-			$output = array_merge($output, $record);
 		}
 		return $output;
 	}

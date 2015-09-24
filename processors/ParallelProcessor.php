@@ -1,18 +1,18 @@
 <?php
 require_once('Processor.php');
 
-class ContinousProcessor extends Processor
+class ParallelProcessor extends Processor
 {
 
 	public function process(array $data)
 	{
 		$output = [];
 		foreach ($data as $label => $record) {
-			$output = array_merge($output, $record);
 			foreach ($this->processUnits as $unit) {
 				$unit->setLabel($label);
-				$output = $unit->process($output);
+				$record = $unit->process($record);
 			}
+			$output = array_merge($output, $record);
 		}
 		return $output;
 	}

@@ -15,4 +15,6 @@ interface ProcessUnitInterface
 	public function setLabel($label);
 
 	public function getLabel();
+
+	public function bind(Processor $processor);
 }

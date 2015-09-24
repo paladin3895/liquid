@@ -14,10 +14,17 @@ $processor3 = new ContinousProcessor([new RegexParser('#[a-zA-Z0-9]+$#')]);
 $processor4 = new ParallelProcessor([new InputLogger]);
 
 
-$node1 = new Node('prototype1', $registry, $processor1);
-$node2 = new Node('prototype2', $registry, $processor2);
-$node3 = new Node('prototype3', $registry, $processor3);
-$node4 = new Node('prototype4', $registry, $processor4);
+$node1 = new Node('prototype1', $registry);
+$node1->bind($processor1);
+
+$node2 = new Node('prototype2', $registry);
+$node2->bind($processor2);
+
+$node3 = new Node('prototype3', $registry);
+$node3->bind($processor3);
+
+$node4 = new Node('prototype4', $registry);
+$node4->bind($processor4);
 
 $node1->split([$node2, $node3]);
 $node3->backward($node2);

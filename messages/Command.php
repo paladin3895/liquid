@@ -1,6 +1,7 @@
 <?php
+require_once('MessageInterface.php');
 
-class Command
+class Command implements MessageInterface
 {
   protected $nodes;
 
@@ -36,8 +37,13 @@ class Command
     return $this->actions;
   }
 
-  public function receivers()
+  public function isReceiver(MessengerInterface $messenger)
   {
-    return $this->receivers;
+    return in_array($messenger->getNode()->getName(), $this->receivers);
+  }
+
+  public function triggerType()
+  {
+    return 'forward';
   }
 }

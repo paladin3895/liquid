@@ -1,10 +1,9 @@
 <?php
-require_once('ContinousProcessor.php');
-require_once('ParalelProcessor.php');
 
 abstract class Processor
 {
 	protected $processUnits;
+	protected $node;
 
 	public function __construct(array $units)
 	{
@@ -12,13 +11,18 @@ abstract class Processor
 		foreach ($units as &$unit) {
 			if (!($unit instanceof ProcessUnitInterface)) throw new Exception('invalid unit passed to Processor');
 			$this->processUnits->attach($unit);
-			$this->unit->bind($this);
+			$unit->bind($this);
 		}
 	}
 
 	public function bind(BaseNode $node)
 	{
 		$this->node = $node;
+	}
+
+	public function getNode()
+	{
+		return $this->node;
 	}
 
 	/*

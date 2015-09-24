@@ -2,8 +2,6 @@
 
 abstract class BaseNode
 {
-	public static $objectPool = [];
-
 	protected $name = "";
 	protected $previouses;
 	protected $nexts;
@@ -23,7 +21,6 @@ abstract class BaseNode
 
 		$this->registry = $registry;
 		$this->name = (string)$name;
-		self::$objectPool[$name] = &$this;
 	}
 
 	public function bind(Processor $processor)
@@ -117,7 +114,7 @@ abstract class BaseNode
 
 	public function handleMessage(MessageInterface $message)
 	{
-		if ($this->processor instanceof MessageHandleInterface)
+		if ($this->processor instanceof MessengerInterface)
 			$this->processor->handle($message);
 		$message->mark($this);
 	}
@@ -139,7 +136,7 @@ abstract class BaseNode
 
 	public function forwardMessage(MessageInterface $message)
 	{
-		foreach ($this->previouses as $node) {
+		foreach ($this->nexts as $node) {
 			if ($message->isMarked($node)) continue;
 			$node->handleMessage($message);
 			$node->forwardMessage($message);
@@ -148,11 +145,21 @@ abstract class BaseNode
 
 	public function backwardMessage(MessageInterface $message)
 	{
-		foreach ($this->nexts as $node) {
+		foreach ($this->previouses as $node) {
 			if ($message->isMarked($node)) continue;
 			$node->handleMessage($message);
 			$node->backwardMessage($message);
 		}
+	}
+
+	public function setInput(array $data)
+	{
+		$this->input = $data;
+	}
+
+	public function getOutput()
+	{
+		return $this->output;
 	}
 
 	protected function _push()

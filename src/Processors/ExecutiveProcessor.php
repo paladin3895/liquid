@@ -1,5 +1,8 @@
 <?php
-require_once('MessengerInterface.php');
+namespace Liquid\Processors;
+
+use Liquid\Processors\ParallelProcessor;
+use Liquid\Processors\MessengerInterface;
 
 class ExecutiveProcessor extends ParallelProcessor implements MessengerInterface
 {

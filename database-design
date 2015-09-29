@@ -1,0 +1,9 @@
+entity
+id  configuration       type
+1   name, class, ...    schema, registry, node, processor
+
+relation
+id relating_id  related_id  relation_type:  node-node: forward
+                                            node-registry: wrap
+                                            node-processor: bind
+                                            registry-node: hold

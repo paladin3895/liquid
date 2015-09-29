@@ -1,5 +1,8 @@
 <?php
-require_once('Processor.php');
+namespace Liquid\Processors;
+
+use Liquid\Processors\Processor;
+use Liquid\Registry;
 
 class WrappingProcessor extends Processor
 {

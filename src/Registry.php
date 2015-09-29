@@ -1,8 +1,25 @@
 <?php
 
+namespace Liquid;
+
+use Liquid\Nodes\BaseNode;
+use SplObjectStorage;
+
 class Registry
 {
+	protected $name;
+
 	protected $registries = [];
+
+	public function __construct($name = null)
+	{
+		$this->name = isset($name) ? (string)$name : uniqid('reg_');
+	}
+
+	public function getName()
+	{
+		return $this->name;
+	}
 
 	public function getDepth($index)
 	{

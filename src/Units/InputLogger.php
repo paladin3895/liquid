@@ -1,5 +1,6 @@
 <?php
-require_once('BaseUnit.php');
+
+namespace Liquid\Units;
 
 class InputLogger extends BaseUnit
 {
@@ -14,5 +15,12 @@ class InputLogger extends BaseUnit
       echo '..............................<br/>';
     }
     return $output;
+  }
+
+  public static function getFormat()
+  {
+    return [
+      'name' => 'string',
+    ];
   }
 }

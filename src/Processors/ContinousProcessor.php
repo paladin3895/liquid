@@ -1,5 +1,7 @@
 <?php
-require_once('Processor.php');
+namespace Liquid\Processors;
+
+use Liquid\Processors\Processor;
 
 class ContinousProcessor extends Processor
 {

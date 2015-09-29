@@ -1,5 +1,7 @@
 <?php
 
+namespace Liquid\Units;
+
 class DummyDataProvider extends BaseUnit
 {
 	public function process(array $record)
@@ -11,4 +13,11 @@ class DummyDataProvider extends BaseUnit
       'version' => '0.1'
     ];
   }
+
+	public static function getFormat()
+	{
+		return [
+			'name' => 'string',
+		];
+	}
 }

@@ -1,18 +1,27 @@
 <?php
 
+namespace Liquid\Processors;
+
+use SplObjectStorage;
+use Liquid\Units\ProcessUnitInterface;
+use Liquid\Nodes\BaseNode;
+
 abstract class Processor
 {
+	protected $name;
 	protected $processUnits;
 	protected $node;
 
-	public function __construct(array $units)
+	public function __construct($name = null)
 	{
+		$this->name = isset($name) ? (string)$name : uniqid('proc_');
 		$this->processUnits = new SplObjectStorage;
-		foreach ($units as &$unit) {
-			if (!($unit instanceof ProcessUnitInterface)) throw new Exception('invalid unit passed to Processor');
-			$this->processUnits->attach($unit);
-			$unit->bind($this);
-		}
+	}
+
+	public function stack(ProcessUnitInterface $unit)
+	{
+		$this->processUnits->attach($unit);
+		$unit->hook($this);
 	}
 
 	public function bind(BaseNode $node)
@@ -23,6 +32,11 @@ abstract class Processor
 	public function getNode()
 	{
 		return $this->node;
+	}
+
+	public function getName()
+	{
+		return $this->name;
 	}
 
 	/*

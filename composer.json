@@ -1,0 +1,16 @@
+{
+    "name": "come-stay/liquid",
+    "description": "Liquid is a lightweight framework for building processing node tree",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "David Pham",
+            "email": "duydatyds@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+      "psr-4": {"Liquid\\": "src/"}
+    }
+}

@@ -1,34 +1,42 @@
 <?php
-require_once('../nodes/Node.php');
-require_once('../processors/ContinousProcessor.php');
-require_once('../processors/ParallelProcessor.php');
-require_once('../helpers/Registry.php');
-require_once('../units/InputLogger.php');
-require_once('../units/DummyDataProvider.php');
-require_once('../units/RegexParser.php');
+require __DIR__ . '/../vendor/autoload.php';
+
+use Liquid\Nodes\Node;
+use Liquid\Processors\ContinousProcessor;
+use Liquid\Processors\ParallelProcessor;
+use Liquid\Registry;
+use Liquid\Units\InputLogger;
+use Liquid\Units\DummyDataProvider;
+use Liquid\Units\RegexParser;
 
 $registry = new Registry();
-$processor1 = new ContinousProcessor([new DummyDataProvider]);
-$processor2 = new ContinousProcessor([]);
-$processor3 = new ContinousProcessor([new RegexParser('#[a-zA-Z0-9]+$#')]);
-$processor4 = new ParallelProcessor([new InputLogger]);
 
+$processor1 = new ContinousProcessor();
+$processor1->stack(new DummyDataProvider);
 
-$node1 = new Node('prototype1', $registry);
+$processor2 = new ContinousProcessor();
+
+$processor3 = new ContinousProcessor();
+$processor3->stack(new RegexParser('name', '#[a-zA-Z0-9]+$#'));
+
+$processor4 = new ParallelProcessor();
+$processor4->stack(new InputLogger);
+
+$node1 = new Node();
 $node1->bind($processor1);
 
-$node2 = new Node('prototype2', $registry);
+$node2 = new Node();
 $node2->bind($processor2);
 
-$node3 = new Node('prototype3', $registry);
+$node3 = new Node();
 $node3->bind($processor3);
 
-$node4 = new Node('prototype4', $registry);
+$node4 = new Node();
 $node4->bind($processor4);
 
 $node1->split([$node2, $node3]);
 $node3->backward($node2);
 $node4->hub([$node1, $node2, $node3]);
 
-$node1->initialize();
+$node1->initialize($registry);
 $registry->run();

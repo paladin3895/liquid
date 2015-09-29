@@ -1,7 +1,13 @@
 <?php
 
+namespace Liquid\Units;
+
+use Liquid\Processors\Processor;
+
 interface ProcessUnitInterface
 {
+	public static function getFormat();
+
 	/*
 	 * $input into the process unit with format
 	 * ['key' => 'scalar value', ...]
@@ -16,5 +22,5 @@ interface ProcessUnitInterface
 
 	public function getLabel();
 
-	public function bind(Processor $processor);
+	public function hook(Processor $processor);
 }

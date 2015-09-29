@@ -1,4 +1,7 @@
 <?php
+namespace Liquid\Processors\MessengerInterface;
+
+use Liquid\Messages\MessageInterface;
 
 interface MessengerInterface
 {

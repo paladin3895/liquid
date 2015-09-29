@@ -1,8 +1,19 @@
 <?php
+namespace Liquid\Nodes;
+
+use Liquid\Processors\Processor;
+use Liquid\Registry;
+use SplObjectStorage;
 
 abstract class BaseNode
 {
-	protected $name = "";
+	const STATUS_TERMINATED		= 0b000;
+	const STATUS_INACTIVE			= 0b001;
+	const STATUS_ACTIVE				= 0b011;
+	const STATUS_INITIALIZED	= 0b111;
+
+	protected $name;
+	protected $status;
 	protected $previouses;
 	protected $nexts;
 
@@ -14,31 +25,32 @@ abstract class BaseNode
 	protected $input = [];
 	protected $output = [];
 
-	public function __construct($name, Registry $registry)
+	public function __construct($name = null)
 	{
 		$this->previouses = new SplObjectStorage;
 		$this->nexts = new SplObjectStorage;
 
-		$this->registry = $registry;
-		$this->name = (string)$name;
+		$this->name = isset($name) ? (string)$name : uniqid('node_');
+		$this->status = self::STATUS_INACTIVE;
 	}
 
 	public function bind(Processor $processor)
 	{
 		$this->processor = $processor;
 		$processor->bind($this);
+		$this->status = self::STATUS_ACTIVE;
 	}
 
 	// create a piping stucture in which
 	// output of one node is input of the nexts
-	public function forward(BaseNode &$next)
+	public function forward(BaseNode $next)
 	{
 		if (!$this->nexts->contains($next)) $this->nexts->attach($next);
 		if (!$next->previouses->contains($this)) $next->previouses->attach($this);
 		$next->depth = ($next->depth > $this->depth) ? $next->depth : ($this->depth + 1);
 	}
 
-	public function backward(BaseNode &$previous)
+	public function backward(BaseNode $previous)
 	{
 		if (!$this->previouses->contains($previous)) $this->previouses->attach($previous);
 		if (!$previous->nexts->contains($this)) $previous->nexts->attach($this);
@@ -47,7 +59,7 @@ abstract class BaseNode
 
 	public function hub(array $previouses)
 	{
-		foreach ($previouses as &$node) {
+		foreach ($previouses as $node) {
 			if (!($node instanceof BaseNode)) throw new Exception('invalid node type');
 			$this->backward($node);
 		}
@@ -55,7 +67,7 @@ abstract class BaseNode
 
 	public function split(array $nexts)
 	{
-		foreach ($nexts as &$node) {
+		foreach ($nexts as $node) {
 			if (!($node instanceof BaseNode)) throw new Exception('invalid node type');
 			$this->forward($node);
 		}
@@ -64,7 +76,11 @@ abstract class BaseNode
 	public function process()
 	{
 		$this->_pull();
-		$this->output = $this->processor->process($this->input);
+		if ($this->status >= self::STATUS_ACTIVE)
+			$this->output = $this->processor->process($this->input);
+		else
+			$this->output = $this->input;
+
 		// $this->_push();
 	}
 
@@ -72,15 +88,18 @@ abstract class BaseNode
 	{
 		$this->unregister();
 		foreach ($this->nexts as $node) {
+			foreach ($node->previouses as $previous_node) {
+				if ($previous_node->status > self::STATUS_TERMINATED) continue 2;
+			}
 			$node->terminate();
 		}
 	}
 
-	public function initialize()
+	public function initialize(Registry $registry)
 	{
-		$this->register();
+		$this->register($registry);
 		foreach ($this->nexts as $node) {
-			$node->initialize();
+			$node->initialize($registry);
 		}
 	}
 
@@ -94,16 +113,19 @@ abstract class BaseNode
 		return $this->name;
 	}
 
-	public function register()
+	public function register(Registry $registry)
 	{
+		$this->registry = $registry;
 		if ($this->registry->hasRegistered($this)) return;
 		$this->registry->register($this);
+		$this->status = self::STATUS_INITIALIZED;
 	}
 
 	public function unregister()
 	{
 		if (!$this->registry->hasRegistered($this)) return;
 		$this->registry->unregister($this);
+		$this->status = self::STATUS_TERMINATED;
 	}
 
 	public function display()
@@ -114,6 +136,7 @@ abstract class BaseNode
 
 	public function handleMessage(MessageInterface $message)
 	{
+		if ($this->staus < self::STATUS_ACTIVE) return;
 		if ($this->processor instanceof MessengerInterface)
 			$this->processor->handle($message);
 		$message->mark($this);

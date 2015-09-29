@@ -1,11 +1,15 @@
 <?php
-require_once('MessageInterface.php');
+namespace Liquid\Messages;
+
+use Liquid\Messages\MessageInterface;
+use Liquid\Processors\MessengerInterface;
+use Liquid\Nodes\BaseNode;
+use SplObjectStorage;
 
 class Command implements MessageInterface
 {
   protected $nodes;
 
-  protected $conditions;
   protected $actions;
   protected $receivers;
 
@@ -19,17 +23,16 @@ class Command implements MessageInterface
     return $this->nodes->contains($node);
   }
 
-  public function __construct(array $receivers, array $conditions, array $actions)
+  public function __construct(array $receivers, array $actions)
   {
     $this->nodes = new SplObjectStorage;
     $this->receivers = $receivers;
-    $this->conditions = $conditions;
     $this->actions = $actions;
   }
 
   public function conditions()
   {
-    return $this->conditions;
+    return [];
   }
 
   public function actions()

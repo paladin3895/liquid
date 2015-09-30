@@ -6,8 +6,8 @@ use Liquid\Builders\RegistryBuilder;
 use Liquid\Builders\ProcessorBuilder;
 use Liquid\Builders\UnitBuilder;
 
-use Liquid\Relation;
-use Liquid\Entity;
+use Liquid\Models\Relation;
+use Liquid\Models\Entity;
 
 class Schema
 {
@@ -17,6 +17,8 @@ class Schema
 	const TYPE_UNIT = 'unit';
 
 	protected $objectPool = [];
+
+	protected $objectGroup = [];
 
 	public function __construct()
 	{
@@ -28,8 +30,14 @@ class Schema
 
 	public function buildRelation(Relation $relation)
 	{
-		$relating = $relation->getRelating($this->objectPool);
-		$related = $relation->getRelated($this->objectPool);
+		$relating_id = $relation->getRelating();
+		$relating = isset($this->objectPool[$relating_id])
+			? $this->objectPool[$relating_id] : false;
+
+		$related_id = $relation->getRelated();
+		$related = isset($this->objectPool[$related_id])
+			? $this->objectPool[$related_id] : false;
+
 		if (!$relating || !$related) return false;
 		call_user_func([$relating, $relation->getAction()], $related);
 	}
@@ -50,7 +58,13 @@ class Schema
 				$object = $this->unitBuilder->make($entity->getConfig());
 				break;
 		}
-		if (isset($object))
-			$this->objectPool[$entity->getType()][$entity->getId()] = $object;
+		if (!isset($object)) return false;
+		$this->objectGroup[$entity->getType()][$entity->getId()] = $object;
+		$this->objectPool[$entity->getId()] = $object;
+	}
+
+	public function getRegistry()
+	{
+		return $this->objectGroup['registry'];
 	}
 }

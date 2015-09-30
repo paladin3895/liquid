@@ -1,6 +1,6 @@
 <?php
 
-namespace Liquid;
+namespace Liquid\Models;
 
 class Entity
 {
@@ -52,15 +52,25 @@ class Entity
   //
   // }
 
+  protected $data;
+
+  public function __construct(array $data)
+  {
+    $this->data = $data;
+  }
+
   public function getId()
   {
-
+    return $this->data['id'];
   }
 
   public function getConfig()
   {
-
+    return $this->data['config'];
   }
 
-  public function getType();
+  public function getType()
+  {
+    return $this->data['type'];
+  }
 }

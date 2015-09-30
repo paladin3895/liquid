@@ -11,9 +11,12 @@ class Registry
 
 	protected $registries = [];
 
+	protected $objectPool;
+
 	public function __construct($name = null)
 	{
 		$this->name = isset($name) ? (string)$name : uniqid('reg_');
+		$this->objectPool = new SplObjectStorage;
 	}
 
 	public function getName()
@@ -30,21 +33,40 @@ class Registry
 			return $this->registries[$index] = new SplObjectStorage;
 	}
 
-	public function register(BaseNode &$node)
+	public function attach(BaseNode $node)
+	{
+		if (!$this->objectPool->contains($node))
+			$this->objectPool->attach($node);
+	}
+
+	public function detach(BaseNode $node)
+	{
+		if ($this->objectPool->contains($node))
+			$this->objectPool->detach($node);
+	}
+
+	public function register(BaseNode $node)
 	{
 		if ($this->hasRegistered($node)) return;
 		else $this->getDepth($node->getDepth())->attach($node);
 	}
 
-	public function unregister(BaseNode &$node)
+	public function unregister(BaseNode $node)
 	{
 		if (!$this->hasRegistered($node)) return;
-		else $this->getDepth($node->getDepth())->dettach($node);
+		else $this->getDepth($node->getDepth())->detach($node);
 	}
 
-	public function hasRegistered(BaseNode &$node)
+	public function hasRegistered(BaseNode $node)
 	{
 		return $this->getDepth($node->getDepth())->contains($node);
+	}
+
+	public function initialize()
+	{
+		foreach ($this->objectPool as $node) {
+			$node->register($this);
+		}
 	}
 
 	public function run()

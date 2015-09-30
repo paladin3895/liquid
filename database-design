@@ -4,6 +4,6 @@ id  configuration       type
 
 relation
 id relating_id  related_id  relation_type:  node-node: forward
-                                            node-registry: wrap
+                                            processor-registry: wrap
                                             node-processor: bind
-                                            registry-node: hold
+                                            registry-node: attach

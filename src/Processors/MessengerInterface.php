@@ -1,5 +1,5 @@
 <?php
-namespace Liquid\Processors\MessengerInterface;
+namespace Liquid\Processors;
 
 use Liquid\Messages\MessageInterface;
 

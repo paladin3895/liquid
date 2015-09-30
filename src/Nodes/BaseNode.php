@@ -2,15 +2,16 @@
 namespace Liquid\Nodes;
 
 use Liquid\Processors\Processor;
+use Liquid\Processors\MessengerInterface;
 use Liquid\Registry;
+use Liquid\Messages\MessageInterface;
 use SplObjectStorage;
 
 abstract class BaseNode
 {
-	const STATUS_TERMINATED		= 0b000;
-	const STATUS_INACTIVE			= 0b001;
-	const STATUS_ACTIVE				= 0b011;
-	const STATUS_INITIALIZED	= 0b111;
+	const STATUS_ALIVE				= 0b001;
+	const STATUS_ACTIVE				= 0b010;
+	const STATUS_INITIALIZED	= 0b100;
 
 	protected $name;
 	protected $status;
@@ -31,14 +32,14 @@ abstract class BaseNode
 		$this->nexts = new SplObjectStorage;
 
 		$this->name = isset($name) ? (string)$name : uniqid('node_');
-		$this->status = self::STATUS_INACTIVE;
+		$this->status |= self::STATUS_ALIVE;
 	}
 
 	public function bind(Processor $processor)
 	{
 		$this->processor = $processor;
 		$processor->bind($this);
-		$this->status = self::STATUS_ACTIVE;
+		$this->status |= self::STATUS_ACTIVE;
 	}
 
 	// create a piping stucture in which
@@ -76,7 +77,7 @@ abstract class BaseNode
 	public function process()
 	{
 		$this->_pull();
-		if ($this->status >= self::STATUS_ACTIVE)
+		if ($this->status & self::STATUS_ACTIVE)
 			$this->output = $this->processor->process($this->input);
 		else
 			$this->output = $this->input;
@@ -84,12 +85,18 @@ abstract class BaseNode
 		// $this->_push();
 	}
 
+	public function attach(Registry $registry)
+	{
+		$registry->attach($this);
+		$this->registry = $registry;
+	}
+
 	public function terminate()
 	{
 		$this->unregister();
 		foreach ($this->nexts as $node) {
 			foreach ($node->previouses as $previous_node) {
-				if ($previous_node->status > self::STATUS_TERMINATED) continue 2;
+				if ($previous_node->status & self::STATUS_ALIVE) continue 2;
 			}
 			$node->terminate();
 		}
@@ -118,14 +125,14 @@ abstract class BaseNode
 		$this->registry = $registry;
 		if ($this->registry->hasRegistered($this)) return;
 		$this->registry->register($this);
-		$this->status = self::STATUS_INITIALIZED;
+		$this->status |= self::STATUS_INITIALIZED;
 	}
 
 	public function unregister()
 	{
 		if (!$this->registry->hasRegistered($this)) return;
 		$this->registry->unregister($this);
-		$this->status = self::STATUS_TERMINATED;
+		$this->status &= ~self::STATUS_INITIALIZED;
 	}
 
 	public function display()
@@ -136,7 +143,7 @@ abstract class BaseNode
 
 	public function handleMessage(MessageInterface $message)
 	{
-		if ($this->staus < self::STATUS_ACTIVE) return;
+		if ($this->status < self::STATUS_ACTIVE) return;
 		if ($this->processor instanceof MessengerInterface)
 			$this->processor->handle($message);
 		$message->mark($this);
@@ -196,6 +203,7 @@ abstract class BaseNode
 	{
 		if ($this->previouses->count() == 0) $this->input['void'] = ['placeholder'];
 		foreach ($this->previouses as $node) {
+			if (empty($node->output)) continue;
 			$this->input[$node->name] = $node->output;
 		}
 	}

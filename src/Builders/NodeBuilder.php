@@ -14,12 +14,14 @@ class NodeBuilder implements BuilderInterface
     'name' => 'string',
   ];
 
+  protected $namespace = 'Liquid\Nodes\\';
+
   public function make(array $config)
   {
     $config = $this->_format($config);
     if (!$config) return;
 
-    $class = new ReflectionClass($config['class']);
+    $class = new ReflectionClass($this->namespace . $config['class']);
     if (!$class->isSubclassOf(BaseNode::class)) return;
     if (!$class->isInstantiable()) return;
     return $class->newInstance($config['name']);
@@ -31,7 +33,7 @@ class NodeBuilder implements BuilderInterface
     foreach ($this->format as $key => $type) {
       if (!array_key_exists($key, $config)) return false;
       if (gettype($config[$key]) != $type) return false;
-      $output[$element] = $config[$element];
+      $output[$key] = $config[$key];
     }
     return $output;
   }

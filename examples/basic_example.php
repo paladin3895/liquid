@@ -6,6 +6,7 @@ use Liquid\Processors\ContinousProcessor;
 use Liquid\Processors\ParallelProcessor;
 use Liquid\Registry;
 use Liquid\Units\InputLogger;
+use Liquid\Units\ElementPicker;
 use Liquid\Units\DummyDataProvider;
 use Liquid\Units\RegexParser;
 
@@ -15,9 +16,10 @@ $processor1 = new ContinousProcessor();
 $processor1->stack(new DummyDataProvider);
 
 $processor2 = new ContinousProcessor();
+$processor2->stack(new ElementPicker(['name', 'version']));
 
 $processor3 = new ContinousProcessor();
-$processor3->stack(new RegexParser('name', '#[a-zA-Z0-9]+$#'));
+$processor3->stack(new RegexParser('author', '#[a-zA-Z0-9]+$#'));
 
 $processor4 = new ParallelProcessor();
 $processor4->stack(new InputLogger);

@@ -2,13 +2,19 @@
 namespace Liquid\Builders;
 
 use Liquid\Builders\BuilderInterface;
-use Liquid\Nodes\BaseNode;
+use Liquid\Registry;
 use ReflectionClass;
 
 class RegistryBuilder implements BuilderInterface
 {
+
+  protected $format = [
+    'name' => 'string',
+  ];
+
   public function make(array $config)
   {
-    
+    $name = isset($config['name']) ? (string)$config['name'] : null;
+    return new Registry($name);
   }
 }

@@ -3,6 +3,7 @@ namespace Liquid\Processors;
 
 use Liquid\Processors\ParallelProcessor;
 use Liquid\Processors\MessengerInterface;
+use Liquid\Messages\MessageInterface;
 
 class ExecutiveProcessor extends ParallelProcessor implements MessengerInterface
 {

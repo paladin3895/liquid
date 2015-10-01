@@ -17,12 +17,12 @@ class UnitBuilder implements BuilderInterface
   {
     $config = $this->_format($config);
     if (!$config) return;
-
     $class = new ReflectionClass($this->namespace . $config['class']);
     if (!$class->implementsInterface(ProcessUnitInterface::class)) return;
     if (!$class->isInstantiable()) return;
 
     $unit = $class->newInstanceArgs($config['arguments']);
+    return $unit;
   }
 
   protected function _format(array $config)

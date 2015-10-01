@@ -1,12 +1,13 @@
 <?php
-require_once('../nodes/Node.php');
-require_once('../processors/ContinousProcessor.php');
-require_once('../processors/ParallelProcessor.php');
-require_once('../processors/WrappingProcessor.php');
-require_once('../helpers/Registry.php');
-require_once('../units/InputLogger.php');
-require_once('../units/DummyDataProvider.php');
-require_once('../units/RegexParser.php');
+use Liquid\Registry;
+use Liquid\Nodes\Node;
+use Liquid\Processors\ContinousProcessor;
+use Liquid\Processors\ParallelProcessor;
+use Liquid\Processors\WrappingProcessor;
+use Liquid\Units\DummyDataProvider;
+use Liquid\Units\InputLogger;
+use Liquid\Units\RegexParser;
+use Liquid\Units\ElementPicker;
 
 $registry1 = new Registry();
 $registry2 = new Registry();

@@ -28,6 +28,7 @@ class RegexParser extends BaseUnit
   public static function getFormat()
   {
     return [
+      'key' => 'string',
       'signature' => 'string',
       'name' => 'string',
     ];

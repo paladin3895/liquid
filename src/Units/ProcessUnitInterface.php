@@ -2,7 +2,7 @@
 
 namespace Liquid\Units;
 
-use Liquid\Processors\Processor;
+use Liquid\Processors\BaseProcessor;
 
 interface ProcessUnitInterface
 {
@@ -22,5 +22,5 @@ interface ProcessUnitInterface
 
 	public function getLabel();
 
-	public function hook(Processor $processor);
+	public function stack(BaseProcessor $processor);
 }

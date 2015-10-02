@@ -4,7 +4,7 @@ namespace Liquid\Builders;
 use Liquid\Builders\BuilderInterface;
 use Liquid\Builders\UnitBuilder;
 
-use Liquid\Processors\Processor;
+use Liquid\Processors\BaseProcessor;
 use ReflectionClass;
 
 class ProcessorBuilder implements BuilderInterface
@@ -30,7 +30,7 @@ class ProcessorBuilder implements BuilderInterface
     if (!$config) return;
 
     $class = new ReflectionClass($this->namespace . $config['class']);
-    if (!$class->isSubclassOf(Processor::class)) return;
+    if (!$class->isSubclassOf(BaseProcessor::class)) return;
     if (!$class->isInstantiable()) return;
     $processor = $class->newInstance($config['name']);
 

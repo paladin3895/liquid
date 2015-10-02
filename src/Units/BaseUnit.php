@@ -2,7 +2,7 @@
 
 namespace Liquid\Units;
 
-use Liquid\Processors\Processor;
+use Liquid\Processors\BaseProcessor;
 
 abstract class BaseUnit implements ProcessUnitInterface
 {
@@ -32,7 +32,7 @@ abstract class BaseUnit implements ProcessUnitInterface
     return $this->recordLabel;
   }
 
-  public function hook(Processor $processor)
+  public function stack(BaseProcessor $processor)
   {
     $this->processor = $processor;
   }

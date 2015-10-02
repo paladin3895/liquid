@@ -6,7 +6,7 @@ use SplObjectStorage;
 use Liquid\Units\ProcessUnitInterface;
 use Liquid\Nodes\BaseNode;
 
-abstract class Processor
+abstract class BaseProcessor
 {
 	protected $name;
 	protected $processUnits;
@@ -21,7 +21,7 @@ abstract class Processor
 	public function stack(ProcessUnitInterface $unit)
 	{
 		$this->processUnits->attach($unit);
-		$unit->hook($this);
+		$unit->stack($this);
 	}
 
 	public function bind(BaseNode $node)

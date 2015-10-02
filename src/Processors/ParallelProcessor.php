@@ -1,9 +1,9 @@
 <?php
 namespace Liquid\Processors;
 
-use Liquid\Processors\Processor;
+use Liquid\Processors\BaseProcessor;
 
-class ParallelProcessor extends Processor
+class ParallelProcessor extends BaseProcessor
 {
 
 	public function process(array $data)

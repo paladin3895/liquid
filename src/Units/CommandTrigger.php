@@ -2,7 +2,7 @@
 
 namespace Liquid\Units;
 
-use Liquid\Messages\Command;
+use Liquid\Messages\Commands\DisplayCommand;
 
 class CommandTrigger extends BaseUnit implements ProcessUnitInterface
 {
@@ -12,7 +12,7 @@ class CommandTrigger extends BaseUnit implements ProcessUnitInterface
   public function __construct(array $conditions, array $receivers, array $actions, $name = null)
   {
     parent::__construct($name);
-    $this->command = new Command($receivers, $actions);
+    $this->command = new DisplayCommand($receivers, $actions);
     $this->conditions = $conditions;
   }
 

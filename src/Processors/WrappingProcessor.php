@@ -1,10 +1,10 @@
 <?php
 namespace Liquid\Processors;
 
-use Liquid\Processors\Processor;
+use Liquid\Processors\BaseProcessor;
 use Liquid\Registry;
 
-class WrappingProcessor extends Processor
+class WrappingProcessor extends BaseProcessor
 {
   protected $registry;
 

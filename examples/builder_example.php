@@ -16,7 +16,13 @@ $entities = [
       'class' => 'ContinousProcessor',
       'name' => 'processor_1',
       'units' => [
-        ['class' => 'DummyDataProvider', 'name' => 'unit_1']
+        ['class' => 'DummyDataProvider', 'name' => 'unit_1', 'data' => [
+            'name' => 'liquid',
+            'author' => 'David Pham',
+            'description' => 'a lightweight framework for data analysis',
+            'version' => '0.1',
+          ]
+        ]
       ]
     ]
   ],

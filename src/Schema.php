@@ -5,6 +5,7 @@ use Liquid\Builders\NodeBuilder;
 use Liquid\Builders\RegistryBuilder;
 use Liquid\Builders\ProcessorBuilder;
 use Liquid\Builders\UnitBuilder;
+use Liquid\Builders\ClosureBuilder;
 
 use Liquid\Models\Relation;
 use Liquid\Models\Entity;
@@ -61,6 +62,16 @@ class Schema
 		if (!isset($object)) return false;
 		$this->objectGroup[$entity->getType()][$entity->getId()] = $object;
 		$this->objectPool[$entity->getId()] = $object;
+	}
+
+	public function saveEntity(array $entity)
+	{
+
+	}
+
+	public function saveRelation(array $relation)
+	{
+
 	}
 
 	public function getRegistry()

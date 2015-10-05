@@ -8,16 +8,18 @@ class WrappingProcessor extends BaseProcessor
 {
   protected $registry;
 
-  public function __construct(Registry $registry)
+  public function wrap(Registry $registry)
   {
     $this->registry = $registry;
   }
 
   public function process(array $data, array $result_input)
   {
+    $this->registry->initialize();
     $this->registry->setInput($data);
     $this->registry->setResult($result_input);
     $this->registry->run();
-    return $this->registry->getResult();
+
+    $this->setOutput($this->registry->getResult());
   }
 }

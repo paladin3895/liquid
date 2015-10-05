@@ -20,7 +20,7 @@ $policies = [
   'policy_image' => [
     'class' => 'function',
     'conditions' => [
-      'images' => 'arr,length:1',
+      'images' => 'arr,length:1|3',
     ],
     'computations' => [
       'point' => 'point + 3 * factor'

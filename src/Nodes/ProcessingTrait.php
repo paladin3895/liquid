@@ -21,7 +21,7 @@ trait ProcessingTrait
     if ($this->status & self::STATUS_ACTIVE)
       $this->processor->process($this->getInput(), $this->getResult());
     else
-      throw new Exception('node ' . $this->name . ' doesnt have a processor');
+      throw new \Exception('node ' . $this->name . ' doesnt have a processor');
     // $this->_push();
   }
 }

@@ -25,7 +25,7 @@ abstract class BaseProcessor
 
 	public function chain(callable $closure)
 	{
-		$this->processUnits[] = $closure($this);
+		$this->processUnits[] = $closure;
 	}
 
 	public function bind(BaseNode $node)

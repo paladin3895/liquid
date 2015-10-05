@@ -13,7 +13,12 @@ use Liquid\Units\RegexParser;
 $registry = new Registry();
 
 $processor1 = new ContinousProcessor();
-$processor1->stack(new DummyDataProvider);
+$processor1->stack(new DummyDataProvider([
+  'name' => 'liquid',
+  'author' => 'David Pham',
+  'description' => 'a lightweight framework for data analysis',
+  'version' => '0.1',
+  ]));
 
 $processor2 = new ContinousProcessor();
 $processor2->stack(new ElementPicker(['name', 'version']));

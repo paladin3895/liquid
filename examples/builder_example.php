@@ -12,12 +12,11 @@ $entities = [
   ['id' => 4, 'type' => 'node', 'config' => ['class' => 'Node', 'name' => 'node_4']],
 
   ['id' => 5, 'type' => 'registry', 'config' => ['name' => 'registry']],
-
   ['id' => 6, 'type' => 'processor', 'config' => [
       'class' => 'ContinousProcessor',
       'name' => 'processor_1',
       'units' => [
-        ['class' => 'DummyDataProvider', 'name' => 'unit_1'],
+        ['class' => 'DummyDataProvider', 'name' => 'unit_1']
       ]
     ]
   ],
@@ -25,8 +24,8 @@ $entities = [
       'class' => 'ExecutiveProcessor',
       'name' => 'processor_2',
       'units' => [
-        ['class' => 'ElementPicker', 'name' => 'unit_4', 'elements' => ['name', 'description', 'version']],
-        ['class' => 'CommandTrigger', 'name' => 'unit_3', 'conditions' => ['name' => 'liquid'], 'receivers' => ['node_3', 'node_4'], 'actions' => ['display' => '', 'terminate' => '']]
+        ['class' => 'RegexParser', 'name' => 'unit_2', 'key' => 'name', 'signature' => '#[a-zA-Z0-9]+$#'],
+        ['class' => 'CommandTrigger', 'name' => 'unit_3', 'conditions' => ['name' => 'Liquid'], 'receivers' => ['processor_3', 'processor_4'], 'actions' => ['node' => 'display']]
       ]
     ]
   ],
@@ -34,7 +33,7 @@ $entities = [
       'class' => 'ExecutiveProcessor',
       'name' => 'processor_3',
       'units' => [
-        ['class' => 'RegexParser', 'name' => 'unit_2', 'key' => 'name', 'signature' => '#[a-zA-Z0-9]+$#'],
+        ['class' => 'ElementPicker', 'name' => 'unit_4', 'elements' => ['name', 'description', 'version']]
       ]
     ]
   ],

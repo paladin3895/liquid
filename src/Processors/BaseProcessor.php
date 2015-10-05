@@ -9,19 +9,23 @@ use Liquid\Nodes\BaseNode;
 abstract class BaseProcessor
 {
 	protected $name;
-	protected $processUnits;
+	protected $processUnits = [];
 	protected $node;
 
 	public function __construct($name = null)
 	{
 		$this->name = isset($name) ? (string)$name : uniqid('proc_');
-		$this->processUnits = new SplObjectStorage;
 	}
 
 	public function stack(ProcessUnitInterface $unit)
 	{
-		$this->processUnits->attach($unit);
+		$this->processUnits[] = $unit;
 		$unit->stack($this);
+	}
+
+	public function chain(callable $closure)
+	{
+		$this->processUnits[] = $closure($this);
 	}
 
 	public function bind(BaseNode $node)

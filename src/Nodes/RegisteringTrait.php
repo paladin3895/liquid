@@ -52,4 +52,14 @@ trait RegisteringTrait
 	{
 		return $this->registry;
 	}
+
+	public function setResult(array $result)
+	{
+		$this->registry->setResult(array $result);
+	}
+
+	public function getResult()
+	{
+		return $this->registry->getResult();
+	}
 }

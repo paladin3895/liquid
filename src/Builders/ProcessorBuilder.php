@@ -3,6 +3,7 @@ namespace Liquid\Builders;
 
 use Liquid\Builders\BuilderInterface;
 use Liquid\Builders\UnitBuilder;
+use Liquid\Builders\ClosureBuilder;
 
 use Liquid\Processors\BaseProcessor;
 use ReflectionClass;
@@ -10,6 +11,7 @@ use ReflectionClass;
 class ProcessorBuilder implements BuilderInterface
 {
   protected $unitBuilder;
+  protected $closureBuilder;
 
   protected $namespace = 'Liquid\Processors\\';
 
@@ -22,6 +24,7 @@ class ProcessorBuilder implements BuilderInterface
   public function __construct()
   {
     $this->unitBuilder = new UnitBuilder;
+    $this->closureBuilder = new ClosureBuilder;
   }
 
   public function make(array $config)
@@ -35,8 +38,15 @@ class ProcessorBuilder implements BuilderInterface
     $processor = $class->newInstance($config['name']);
 
     foreach ($config['units'] as $unitConfig) {
-      $unit = $this->unitBuilder->make($unitConfig);
-      if ($unit) $processor->stack($unit);
+      if (!isset($unitConfig['class'])) continue;
+
+      if ($unitConfig['class'] == 'function') {
+        $unit = $this->closureBuilder->make($unitConfig);
+        if ($unit) $processor->chain($unit);
+      } else {
+        $unit = $this->unitBuilder->make($unitConfig);
+        if ($unit) $processor->stack($unit);
+      }
     }
     return $processor;
   }

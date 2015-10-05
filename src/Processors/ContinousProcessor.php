@@ -2,6 +2,7 @@
 namespace Liquid\Processors;
 
 use Liquid\Processors\BaseProcessor;
+use Liquid\Units\ProcessUnitInterface;
 
 class ContinousProcessor extends BaseProcessor
 {
@@ -12,8 +13,12 @@ class ContinousProcessor extends BaseProcessor
 		foreach ($data as $label => $record) {
 			$output = array_merge($output, $record);
 			foreach ($this->processUnits as $unit) {
-				$unit->setLabel($label);
-				$output = $unit->process($output);
+				if ($unit instanceof ProcessUnitInterface) {
+					$unit->setLabel($label);
+					$output = $unit->process($output);
+				} elseif (is_callable($unit)) {
+					$output = $unit($record);
+				}
 			}
 		}
 		return $output;

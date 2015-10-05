@@ -13,6 +13,8 @@ class Registry
 
 	protected $objectPool;
 
+	protected $result = [];
+
 	public function __construct($name = null)
 	{
 		$this->name = isset($name) ? (string)$name : uniqid('reg_');
@@ -94,5 +96,15 @@ class Registry
 			$output = array_merge($output, $node->getOutput());
 		}
 		return $output;
+	}
+
+	public function getResult()
+	{
+		return $this->result;
+	}
+
+	public function setResult(array $result)
+	{
+		$this->result = $result;
 	}
 }

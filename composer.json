@@ -10,7 +10,8 @@
     ],
     "minimum-stability": "dev",
     "require": {
-      
+        "respect/validation": "^1.0@dev",
+        "symfony/expression-language": "^3.0@dev"
     },
     "autoload": {
       "psr-4": {"Liquid\\": "src/"}

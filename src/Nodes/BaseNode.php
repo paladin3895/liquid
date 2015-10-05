@@ -53,6 +53,16 @@ abstract class BaseNode
 		$this->input = $data;
 	}
 
+	public function getInput()
+	{
+		return $this->input;
+	}
+
+	public function setOutput(array $data)
+	{
+		$this->output = $data;
+	}
+
 	public function getOutput()
 	{
 		return $this->output;

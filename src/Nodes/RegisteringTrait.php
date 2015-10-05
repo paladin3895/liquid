@@ -55,7 +55,7 @@ trait RegisteringTrait
 
 	public function setResult(array $result)
 	{
-		$this->registry->setResult(array $result);
+		$this->registry->setResult($result);
 	}
 
 	public function getResult()

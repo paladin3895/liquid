@@ -13,10 +13,11 @@ class WrappingProcessor extends BaseProcessor
     $this->registry = $registry;
   }
 
-  public function process(array $data)
+  public function process(array $data, array $result_input)
   {
     $this->registry->setInput($data);
+    $this->registry->setResult($result_input);
     $this->registry->run();
-    return $this->registry->getOutput();
+    return $this->registry->getResult();
   }
 }

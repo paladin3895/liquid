@@ -19,9 +19,9 @@ trait ProcessingTrait
   {
     $this->_pull();
     if ($this->status & self::STATUS_ACTIVE)
-      $this->output = $this->processor->process($this->input);
+      $this->processor->process($this->getInput(), $this->getResult());
     else
-      $this->output = $this->input;
+      throw new Exception('node ' . $this->name . ' doesnt have a processor');
     // $this->_push();
   }
 }

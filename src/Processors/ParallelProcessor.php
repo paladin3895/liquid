@@ -6,20 +6,24 @@ use Liquid\Units\ProcessUnitInterface;
 
 class ParallelProcessor extends BaseProcessor
 {
-	public function process(array $data)
+	public function process(array $data, array $result_input)
 	{
 		$output = [];
+		$result_output = [];
 		foreach ($data as $label => $record) {
+			$result_temp = $result_input;
 			foreach ($this->processUnits as $unit) {
 				if ($unit instanceof ProcessUnitInterface) {
 					$unit->setLabel($label);
 					$record = $unit->process($record);
 				} elseif (is_callable($unit)) {
-					$record = $unit($record);
+					$result_temp = $unit($record, $result_temp);
 				}
 			}
 			$output = array_merge($output, $record);
+			$result_output = array_merge($result_output, $result_temp);
 		}
-		return $output;
+		$this->setOutput($output);
+		$this->setResult($result_output);
 	}
 }

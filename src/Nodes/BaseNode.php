@@ -85,5 +85,5 @@ abstract class BaseNode
 	}
 
 	use RegisteringTrait, ConnectingTrait, ProcessingTrait;
-	use TriggeringTrait, SignalingTrait;
+	use TriggeringTrait;
 }

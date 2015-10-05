@@ -43,6 +43,16 @@ abstract class BaseProcessor
 		return $this->name;
 	}
 
+	public function setResult(array $result)
+	{
+		$this->node->setResult($result);
+	}
+
+	public function setOutput(array $output)
+	{
+		$this->node->setOutput($output);
+	}
+
 	/*
 	 * $input into the processor with format
 	 * ['node_name' => ['key' => 'scalar value', ...], ...]
@@ -51,5 +61,5 @@ abstract class BaseProcessor
 	 * ['node_name' => ['key' => 'scalar value', ...], ...]
 	 * at the next node to keep data format consistent
 	 */
-	abstract public function process(array $data);
+	abstract public function process(array $data, array $result_input);
 }

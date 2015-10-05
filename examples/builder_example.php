@@ -25,7 +25,7 @@ $entities = [
       'name' => 'processor_2',
       'units' => [
         ['class' => 'RegexParser', 'name' => 'unit_2', 'key' => 'name', 'signature' => '#[a-zA-Z0-9]+$#'],
-        ['class' => 'CommandTrigger', 'name' => 'unit_3', 'conditions' => ['name' => 'Liquid'], 'receivers' => ['processor_3', 'processor_4'], 'actions' => ['node' => 'display']]
+        ['class' => 'CommandTrigger', 'name' => 'unit_3', 'conditions' => ['name' => 'liquid'], 'receivers' => ['node_3', 'node_4'], 'actions' => ['node' => 'display']]
       ]
     ]
   ],

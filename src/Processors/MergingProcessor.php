@@ -10,13 +10,13 @@ class MergingProcessor extends BaseProcessor
 	public function process(array $data, array $result_input)
 	{
     $input = [];
-    foreach (array $data as $record) {
+    foreach ($data as $record) {
       $input = array_merge($input, $record);
     }
 
+		$result_output = $result_input;
 		foreach ($this->processUnits as $unit) {
 			if ($unit instanceof ProcessUnitInterface) {
-				$unit->setLabel($label);
 				$output = $unit->process($record);
 			} elseif (is_callable($unit)) {
 				$result_output = $unit($record, $result_input);

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>NodeTree</title>
+        <script src="../resources/js/go-debug.js"></script>
+        <script>
+            function buildNodeTree() {
+
+                var GO = go.GraphObject.make;
+
+                var diagram = GO(go.Diagram, "node-tree-container");
+                diagram.initialContentAlignment = go.Spot.Center;
+                diagram.undoManager.isEnabled = true;
+                diagram.layout = GO(go.LayeredDigraphLayout);
+                diagram.nodeTemplate = GO(go.Node, go.Panel.Auto,
+                    GO(go.Shape, { figure: "RoundedRectangle" }, new go.Binding("fill", "color")),
+                    GO(go.TextBlock, { margin: 3 }, new go.Binding("text", "key")),
+                    { click: function(event, node) {
+                        window.console.log(node.data.description);
+                    }}
+                );
+                diagram.linkTemplate = GO(go.Link,
+                    { routing: go.Link.Orthogonal, corner: 5 },
+                    GO(go.Shape, { strokeWidth: 3, stroke: "#555" }),
+                    GO(go.Shape, { toArrow: "standard", stroke: null })
+                );
+
+                var model = GO(go.GraphLinksModel);
+                model.nodeDataArray = [
+                    { key : "Alpha", color : "lightcoral", description : "red" },
+                    { key : "Beta", color : "lightblue", description : "blue" },
+                    { key : "Gamma", color : "lightgreen", description : "green" },
+                    { key : "Delta", color : "lightyellow", description : "yellow" },
+                ];
+                model.linkDataArray = [
+                    { from : "Alpha", to : "Beta" },
+                    { from : "Alpha", to : "Gamma" },
+                    { from : "Beta", to : "Gamma" },
+                    { from : "Beta", to : "Delta" },
+                ];
+
+                diagram.model = model;
+                diagram.makeSvg();
+            }
+
+        </script>
+    </head>
+    <body onload="buildNodeTree()">
+        <div id="node-tree-container" style="width: 500px; height: 500px;">
+        </div>
+    </body>
+</html>

@@ -7,11 +7,12 @@
     </head>
     <body>
         <div id="node-tree-container" style="width: 500px; height: 500px;"></div>
-        <button type="button" onclick="loadSchema()">Load Schema</button>
+        <button type="button" data-url="schema1.json" onclick='loadSchema(this.dataset.url)'>Load Schema</button>
+        <button type="button" data-url="schema2.json" onclick='loadSchema(this.dataset.url)'>Load Schema</button>
         <div id="node-pallete" style="width: 500px; height: 500px;"></div>
         <script>
             var diagram = init();
-            function loadSchema() {
+            function loadSchema(url) {
                 var xhttp = new XMLHttpRequest();
                 function load(model) {
                     diagram.model = model;
@@ -23,7 +24,7 @@
                         load(model);
                     }
                 }
-                xhttp.open("GET", "schema.json", true);
+                xhttp.open("GET", url, true);
                 xhttp.send();
             }
 
@@ -60,7 +61,7 @@
             }
 
             function display(node) {
-                window.console.log(node.data.description);
+                alert(node.data.description);
             }
 
         </script>

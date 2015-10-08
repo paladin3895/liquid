@@ -4,20 +4,42 @@
         <meta charset="utf-8" />
         <title>NodeTree</title>
         <script src="../resources/js/go-debug.js"></script>
+    </head>
+    <body>
+        <div id="node-tree-container" style="width: 500px; height: 500px;"></div>
+        <button type="button" onclick="loadSchema()">Load Schema</button>
+        <div id="node-pallete" style="width: 500px; height: 500px;"></div>
         <script>
-            function buildNodeTree() {
+            var diagram = init();
+            function loadSchema() {
+                var xhttp = new XMLHttpRequest();
+                function load(model) {
+                    diagram.model = model;
+                }
+                xhttp.onreadystatechange = function() {
+                    if (xhttp.readyState == 4 && xhttp.status == 200) {
+                        var schema = JSON.parse(xhttp.responseText);
+                        var model = setModel(schema);
+                        load(model);
+                    }
+                }
+                xhttp.open("GET", "schema.json", true);
+                xhttp.send();
+            }
 
+            function init() {
                 var GO = go.GraphObject.make;
-
                 var diagram = GO(go.Diagram, "node-tree-container");
                 diagram.initialContentAlignment = go.Spot.Center;
                 diagram.undoManager.isEnabled = true;
                 diagram.layout = GO(go.LayeredDigraphLayout);
                 diagram.nodeTemplate = GO(go.Node, go.Panel.Auto,
-                    GO(go.Shape, { figure: "RoundedRectangle" }, new go.Binding("fill", "color")),
-                    GO(go.TextBlock, { margin: 3 }, new go.Binding("text", "key")),
+                    GO(go.Shape, { figure: "RoundedRectangle" },
+                        new go.Binding("fill", "description")
+                    ),
+                    GO(go.TextBlock, { margin: 3 }, new go.Binding("text", "name")),
                     { click: function(event, node) {
-                        window.console.log(node.data.description);
+                        display(node);
                     }}
                 );
                 diagram.linkTemplate = GO(go.Link,
@@ -26,28 +48,21 @@
                     GO(go.Shape, { toArrow: "standard", stroke: null })
                 );
 
-                var model = GO(go.GraphLinksModel);
-                model.nodeDataArray = [
-                    { key : "Alpha", color : "lightcoral", description : "red" },
-                    { key : "Beta", color : "lightblue", description : "blue" },
-                    { key : "Gamma", color : "lightgreen", description : "green" },
-                    { key : "Delta", color : "lightyellow", description : "yellow" },
-                ];
-                model.linkDataArray = [
-                    { from : "Alpha", to : "Beta" },
-                    { from : "Alpha", to : "Gamma" },
-                    { from : "Beta", to : "Gamma" },
-                    { from : "Beta", to : "Delta" },
-                ];
+                return diagram;
+            }
 
-                diagram.model = model;
-                diagram.makeSvg();
+            function setModel(schema) {
+                var model = go.GraphObject.make(go.GraphLinksModel);
+                model.nodeDataArray = schema.nodeDataArray;
+                model.linkDataArray = schema.linkDataArray;
+
+                return model;
+            }
+
+            function display(node) {
+                window.console.log(node.data.description);
             }
 
         </script>
-    </head>
-    <body onload="buildNodeTree()">
-        <div id="node-tree-container" style="width: 500px; height: 500px;">
-        </div>
     </body>
 </html>

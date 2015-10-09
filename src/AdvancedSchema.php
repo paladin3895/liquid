@@ -10,7 +10,7 @@ use Liquid\Builders\ClosureBuilder;
 use Liquid\Models\Relation;
 use Liquid\Models\Entity;
 
-class Schema
+class AdvancedSchema
 {
 	const TYPE_NODE = 'node';
 	const TYPE_REGISTRY = 'registry';

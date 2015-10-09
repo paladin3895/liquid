@@ -2,7 +2,7 @@
 
 namespace Liquid\Models;
 
-class Relation
+class Schema
 {
-  
+
 }

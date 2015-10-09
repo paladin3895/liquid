@@ -7,3 +7,12 @@ id relating_id  related_id  relation_type:  node-node: forward
                                             processor-registry: wrap
                                             node-processor: bind
                                             registry-node: attach
+
+schema
+id  name  description
+
+node
+id  configuration schema
+
+relation
+id  from_id to_id

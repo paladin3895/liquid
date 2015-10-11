@@ -10,19 +10,18 @@ class NodeBuilder implements BuilderInterface
   protected $class;
 
   protected $format = [
-    'class' => 'string',
     'name' => 'string',
   ];
 
-  protected $namespace = 'Liquid\Nodes\\';
+  protected $namespace = 'Liquid\Nodes\Node';
 
   public function make(array $config)
   {
     $config = $this->_format($config);
     if (!$config) return;
 
-    $class = new ReflectionClass($this->namespace . $config['class']);
-    if (!$class->isSubclassOf(BaseNode::class)) return;
+    $class = new ReflectionClass($this->namespace);
+    if (!$class->isSubclassOf('Liquid\Nodes\BaseNode')) return;
     if (!$class->isInstantiable()) return;
     return $class->newInstance($config['name']);
   }

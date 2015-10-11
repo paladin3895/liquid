@@ -71,13 +71,15 @@ class Registry
 		}
 	}
 
-	public function run()
+	public function process(array $data = null)
 	{
+		if ($data) $this->setInput($data);
 		foreach ($this->registries as $depth) {
 			foreach ($depth as $node) {
 				$node->process();
 			}
 		}
+		return $this->result;
 	}
 
 	public function setInput(array $data)

@@ -8,12 +8,6 @@ trait RegisteringTrait
 {
 	protected $registry;
 
-  public function attach(Registry $registry)
-  {
-    $registry->attach($this);
-    $this->registry = $registry;
-  }
-
   public function terminate()
   {
     $this->unregister();

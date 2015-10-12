@@ -6,4 +6,4 @@ $schema = new Liquid\Schema;
 
 $registry = $schema->build($diagram->get(1));
 
-var_dump($registry->process(['test' => ['name' => 'liquid']]));
+var_dump($registry->process(['test' => ['name' => 'liquid with come-stay']]));

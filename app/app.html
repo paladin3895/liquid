@@ -1,69 +1,35 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <title>NodeTree</title>
-        <script src="../resources/js/go-debug.js"></script>
-    </head>
-    <body>
-        <div id="node-tree-container" style="width: 500px; height: 500px;"></div>
-        <button type="button" data-url="schema1.json" onclick='loadSchema(this.dataset.url)'>Load Schema</button>
-        <button type="button" data-url="schema2.json" onclick='loadSchema(this.dataset.url)'>Load Schema</button>
-        <div id="node-pallete" style="width: 500px; height: 500px;"></div>
-        <script>
-            var diagram = init();
-            function loadSchema(url) {
-                var xhttp = new XMLHttpRequest();
-                function load(model) {
-                    diagram.model = model;
-                }
-                xhttp.onreadystatechange = function() {
-                    if (xhttp.readyState == 4 && xhttp.status == 200) {
-                        var schema = JSON.parse(xhttp.responseText);
-                        var model = setModel(schema);
-                        load(model);
-                    }
-                }
-                xhttp.open("GET", url, true);
-                xhttp.send();
-            }
+<head>
+<title>Liquid</title>
+<!-- Copyright 1998-2015 by Northwoods Software Corporation. -->
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="../resources/css/diagram.css">
+<script src="../resources/js/go-debug.js"></script>
+<script src="../resources/js/diagram.js"></script>
+</head>
+<body onload="init()">
+<div>
+  <div class="container">
+    <span class="pallete">
+      <div id="myPalette" class="pallete"></div>
+    </span>
 
-            function init() {
-                var GO = go.GraphObject.make;
-                var diagram = GO(go.Diagram, "node-tree-container");
-                diagram.initialContentAlignment = go.Spot.Center;
-                diagram.undoManager.isEnabled = true;
-                diagram.layout = GO(go.LayeredDigraphLayout);
-                diagram.nodeTemplate = GO(go.Node, go.Panel.Auto,
-                    GO(go.Shape, { figure: "RoundedRectangle" },
-                        new go.Binding("fill", "description")
-                    ),
-                    GO(go.TextBlock, { margin: 3 }, new go.Binding("text", "name")),
-                    { click: function(event, node) {
-                        display(node);
-                    }}
-                );
-                diagram.linkTemplate = GO(go.Link,
-                    { routing: go.Link.Orthogonal, corner: 5 },
-                    GO(go.Shape, { strokeWidth: 3, stroke: "#555" }),
-                    GO(go.Shape, { toArrow: "standard", stroke: null })
-                );
+    <span class="diagram">
+      <div id="myDiagram" class="diagram"></div>
+    </span>
 
-                return diagram;
-            }
-
-            function setModel(schema) {
-                var model = go.GraphObject.make(go.GraphLinksModel);
-                model.nodeDataArray = schema.nodeDataArray;
-                model.linkDataArray = schema.linkDataArray;
-
-                return model;
-            }
-
-            function display(node) {
-                alert(node.data.description);
-            }
-
-        </script>
-    </body>
+    <span class="panel">
+      <div id="myPanel" class="panel">
+        <textarea id="nodeDetail"></textarea>
+        <textarea id="nodeDataArray">[]</textarea>
+        <textarea id="linkDataArray">[]</textarea>
+        <button id="saveDetailButton" onclick="saveDetail()" disabled>Save Detail</button>
+        <button id="SaveButton" onclick="save()">Save</button>
+        <button onclick="load()">Load</button>
+      </div>
+    </span>
+  </div>
+</div>
+</body>
 </html>

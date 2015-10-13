@@ -17,7 +17,7 @@ class Diagram
   protected $table = 'diagram';
 
   protected $connectionParams = [
-		'sqlite:database/liquid.db', null, null,
+		'sqlite:/home/knight/Documents/Project/liquid/database/liquid.db', null, null,
 		// [PDO::ATTR_PERSISTENT => true]
   ];
 
@@ -30,7 +30,7 @@ class Diagram
     // $this->_migration();
   }
 
-  protected function _migration()
+  public function migration()
   {
     $this->connection->exec("CREATE TABLE {$this->table} (
       id INTEGER AUTOINCREMENT,
@@ -40,12 +40,6 @@ class Diagram
       links TEXT,
       PRIMARY KEY(id)
     )");
-    $this->create([
-      'name' => 'test',
-      'description' => 'testing schema',
-      'nodes' => '[]',
-      'links' => '[]'
-      ]);
   }
 
   public function index()

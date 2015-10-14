@@ -24,6 +24,63 @@ function init() {
     }
   });
 
+  // helper definitions for node templates
+  function nodeStyle() {
+    return [
+      // The Node.location comes from the "loc" property of the node data,
+      // converted by the Point.parse static method.
+      // If the Node.location is changed, it updates the "loc" property of the node data,
+      // converting back using the Point.stringify static method.
+      // new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+      {
+        // the Node.location is at the center of each node
+        locationSpot: go.Spot.Center,
+        //isShadowed: true,
+        //shadowColor: "#888",
+        // handle mouse enter/leave events to show/hide the ports
+        mouseEnter: function (e, obj) { showPorts(obj.part, true); },
+        mouseLeave: function (e, obj) { showPorts(obj.part, false); },
+        click: function (e, obj) {
+          showDetail(obj);
+          var button = document.getElementById("saveDetailButton");
+          if (button) button.disabled = false;
+        },
+      }
+    ];
+  }
+
+  function nodeColor(type) {
+    switch (type) {
+      case 'continous': return 'lightgreen';
+      case 'parallel': return 'lightblue';
+      case 'merging': return 'yellow';
+      case 'executive': return 'lightcoral';
+      default: return 'black';
+    }
+  }
+
+  function setKey() {
+    var count = myDiagram.nodes.count;
+    return count++;
+  }
+  // Define a function for creating a "port" that is normally transparent.
+  // The "name" is used as the GraphObject.portId, the "spot" is used to control how links connect
+  // and where the port is positioned on the node, and the boolean "output" and "input" arguments
+  // control whether the user can draw links from or to the port.
+  function makePort(name, spot, output, input) {
+    // the port is basically just a small circle that has a white stroke when it is made visible
+    return GO(go.Shape, "Circle",
+             {
+                fill: "transparent",
+                stroke: null,  // this is changed to "white" in the showPorts function
+                desiredSize: new go.Size(8, 8),
+                alignment: spot, alignmentFocus: spot,  // align the port on the main Shape
+                portId: name,  // declare this object to be a "port"
+                fromSpot: spot, toSpot: spot,  // declare where links may connect at this port
+                fromLinkable: output, toLinkable: input,  // declare whether the user may draw links to/from here
+                cursor: "pointer"  // show a different cursor to indicate potential link point
+             });
+  }
   // define the Node templates for regular nodes
   var lightText = 'black';
   myDiagram.nodeTemplateMap.add("continous",  // the default category
@@ -182,8 +239,6 @@ function init() {
           new go.Binding("text", "text").makeTwoWay())
       )
     );
-  // Make link labels visible if coming out of a "conditional" node.
-  // This listener is called by the "LinkDrawn" and "LinkRelinked" DiagramEvents.
 
   // temporary links used by LinkingTool and RelinkingTool are also orthogonal:
   myDiagram.toolManager.linkingTool.temporaryLink.routing = go.Link.Orthogonal;
@@ -207,56 +262,18 @@ function init() {
           // { category: "Comment", text: "Comment" }
         ])
       });
+
+  listSchema();
+  getSchema();
 }
 
-// helper definitions for node templates
-function nodeStyle() {
-  return [
-    // The Node.location comes from the "loc" property of the node data,
-    // converted by the Point.parse static method.
-    // If the Node.location is changed, it updates the "loc" property of the node data,
-    // converting back using the Point.stringify static method.
-    // new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
-    {
-      // the Node.location is at the center of each node
-      locationSpot: go.Spot.Center,
-      //isShadowed: true,
-      //shadowColor: "#888",
-      // handle mouse enter/leave events to show/hide the ports
-      mouseEnter: function (e, obj) { showPorts(obj.part, true); },
-      mouseLeave: function (e, obj) { showPorts(obj.part, false); },
-      click: function (e, obj) {
-        showDetail(obj);
-        var button = document.getElementById("saveDetailButton");
-        if (button) button.disabled = false;
-      },
-    }
-  ];
-}
-
-// Define a function for creating a "port" that is normally transparent.
-// The "name" is used as the GraphObject.portId, the "spot" is used to control how links connect
-// and where the port is positioned on the node, and the boolean "output" and "input" arguments
-// control whether the user can draw links from or to the port.
-function makePort(name, spot, output, input) {
-  // the port is basically just a small circle that has a white stroke when it is made visible
-  return go.GraphObject.make(go.Shape, "Circle",
-           {
-              fill: "transparent",
-              stroke: null,  // this is changed to "white" in the showPorts function
-              desiredSize: new go.Size(8, 8),
-              alignment: spot, alignmentFocus: spot,  // align the port on the main Shape
-              portId: name,  // declare this object to be a "port"
-              fromSpot: spot, toSpot: spot,  // declare where links may connect at this port
-              fromLinkable: output, toLinkable: input,  // declare whether the user may draw links to/from here
-              cursor: "pointer"  // show a different cursor to indicate potential link point
-           });
-}
-
+// Make link labels visible if coming out of a "conditional" node.
+// This listener is called by the "LinkDrawn" and "LinkRelinked" DiagramEvents.
 function showLinkLabel(e) {
   var label = e.subject.findObject("LABEL");
   if (label !== null) label.visible = (e.subject.fromNode.data.figure === "Diamond");
 }
+
 // Make all ports on a node visible when the mouse is over the node
 function showPorts(node, show) {
   var diagram = node.diagram;
@@ -285,15 +302,68 @@ function saveDetail() {
   myDiagram.isModified = true;
   // myDiagram.commitTransaction("modify node detail");
 }
+
 // Show the diagram's model in JSON format that the user may edit
 function save() {
   document.getElementById("nodeDataArray").value = JSON.stringify(myDiagram.model.nodeDataArray);
   document.getElementById("linkDataArray").value = JSON.stringify(myDiagram.model.linkDataArray);
   myDiagram.isModified = false;
 }
+
 function load() {
   var model = go.GraphObject.make(go.GraphLinksModel);
   model.nodeDataArray = JSON.parse(document.getElementById("nodeDataArray").value);
   model.linkDataArray = JSON.parse(document.getElementById("linkDataArray").value);
   myDiagram.model = model;
+}
+
+function ajax(method, url, data, callback) {
+  var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (xhttp.readyState == 4 && xhttp.status == 200) {
+       callback(xhttp.responseText);
+      }
+    }
+    xhttp.open(method, url, true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.send(serialize(data));
+}
+
+function serialize(data) {
+  var format = ['id', 'name', 'description', 'nodes', 'links'];
+  var string = '';
+  for (var i = 0; i < format.length; i++) {
+    if (data[format[i]]) string += format[i] + '=' + data[format[i]] + '&';
+  }
+  return string;
+}
+
+function listSchema() {
+  ajax('GET', 'backend/index.php', {},
+    function (data) {
+      data = JSON.parse(data);
+      // get reference to select element
+      var sel = document.getElementById('schema-list');
+      for (var i = 0; i < data.length; i++) {
+        var opt = document.createElement('option'); // create new option element
+        // create text node to add to option element (opt)
+        opt.appendChild( document.createTextNode(data[i].name) );
+        opt.value = data[i].id; // set value property of opt
+        sel.appendChild(opt); // add opt to end of select box (sel)
+      }
+    }
+  )
+}
+
+function getSchema(id) {
+  ajax('GET', 'backend/get.php?id=' + id, {},
+    function (data) {
+      data = JSON.parse(data);
+      var nodes = document.getElementById('nodeDataArray');
+      var links = document.getElementById('linkDataArray');
+      console.log(data.nodes);
+      nodes.value = data.nodes;
+      links.value = data.links;
+    }
+  )
 }

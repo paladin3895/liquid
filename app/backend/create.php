@@ -1,7 +1,12 @@
 <?php
 require __DIR__ . '/../../vendor/autoload.php';
 
-if (!isset($_POST['id'])) return;
+if ($_SERVER['REQUEST_METHOD'] != 'POST') return false;
+$params = $_POST;
+$format = ['name', 'description', 'nodes', 'links'];
+foreach ($format as $key) {
+  if (!isset($params[$key])) return false;
+}
 $diagram = new Liquid\Models\Diagram;
 header('Content-Type: application/json');
-echo json_encode($diagram->get($_GET['id']));
+echo json_encode($diagram->create($params));

@@ -248,12 +248,7 @@
             new go.Binding("text", "text").makeTwoWay())
         )
       );
-    // Make link labels visible if coming out of a "conditional" node.
-    // This listener is called by the "LinkDrawn" and "LinkRelinked" DiagramEvents.
-    function showLinkLabel(e) {
-      var label = e.subject.findObject("LABEL");
-      if (label !== null) label.visible = (e.subject.fromNode.data.figure === "Diamond");
-    }
+
     // temporary links used by LinkingTool and RelinkingTool are also orthogonal:
     myDiagram.toolManager.linkingTool.temporaryLink.routing = go.Link.Orthogonal;
     myDiagram.toolManager.relinkingTool.temporaryLink.routing = go.Link.Orthogonal;
@@ -277,6 +272,14 @@
           ])
         });
   }
+
+  // Make link labels visible if coming out of a "conditional" node.
+  // This listener is called by the "LinkDrawn" and "LinkRelinked" DiagramEvents.
+  function showLinkLabel(e) {
+    var label = e.subject.findObject("LABEL");
+    if (label !== null) label.visible = (e.subject.fromNode.data.figure === "Diamond");
+  }
+
   // Make all ports on a node visible when the mouse is over the node
   function showPorts(node, show) {
     var diagram = node.diagram;
@@ -305,25 +308,83 @@
     myDiagram.isModified = true;
     // myDiagram.commitTransaction("modify node detail");
   }
+
   // Show the diagram's model in JSON format that the user may edit
   function save() {
     document.getElementById("nodeDataArray").value = JSON.stringify(myDiagram.model.nodeDataArray);
     document.getElementById("linkDataArray").value = JSON.stringify(myDiagram.model.linkDataArray);
     myDiagram.isModified = false;
   }
+
   function load() {
     var model = go.GraphObject.make(go.GraphLinksModel);
     model.nodeDataArray = JSON.parse(document.getElementById("nodeDataArray").value);
     model.linkDataArray = JSON.parse(document.getElementById("linkDataArray").value);
     myDiagram.model = model;
   }
+
+  function ajax(method, url, data, callback) {
+    var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+         callback(xhttp.responseText);
+        }
+      }
+      xhttp.open(method, url, true);
+      xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xhttp.send(serialize(data));
+  }
+
+  function serialize(data) {
+    var format = ['id', 'name', 'description', 'nodes', 'links'];
+    var string = '';
+    for (var i = 0; i < format.length; i++) {
+      if (data[format[i]]) string += format[i] + '=' + data[format[i]] + '&';
+    }
+    return string;
+  }
+
+  function listSchema() {
+    ajax('GET', 'backend/index.php', {},
+      function (data) {
+        data = JSON.parse(data);
+        // get reference to select element
+        var sel = document.getElementById('schema-list');
+        for (var i = 0; i < data.length; i++) {
+          var opt = document.createElement('option'); // create new option element
+          // create text node to add to option element (opt)
+          opt.appendChild( document.createTextNode(data[i].name) );
+          opt.value = data[i].id; // set value property of opt
+          sel.appendChild(opt); // add opt to end of select box (sel)
+        }
+      }
+    )
+  }
+
+  function getSchema(id) {
+    ajax('GET', 'backend/get.php?id=' + id, {},
+      function (data) {
+        data = JSON.parse(data);
+        var nodes = document.getElementById('nodeDataArray');
+        var links = document.getElementById('linkDataArray');
+        nodes.value = data.nodes;
+        links.value = data.links;
+      }
+    )
+  }
+
+  listSchema();
+  getSchema(1);
 </script>
 </head>
 <body onload="init()">
 <div id="sample">
   <div style="width:100%; white-space:nowrap;">
     <span style="display: inline-block; vertical-align: top; padding: 5px; width:10%">
-      <div id="myPalette" style="border: solid 1px gray; height: 600px"></div>
+      <div id="myPalette" style="border: solid 1px gray; height: 300px"></div>
+      <select id="schema-list" onload="listSchema()" style="width:100%">
+      </select>
+
     </span>
 
     <span style="display: inline-block; vertical-align: top; padding: 5px; width:50%">

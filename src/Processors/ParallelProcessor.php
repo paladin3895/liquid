@@ -6,6 +6,8 @@ use Liquid\Units\ProcessUnitInterface;
 
 class ParallelProcessor extends BaseProcessor
 {
+	public static $alias = 'parallel';
+
 	public function process(array $data, array $result_input)
 	{
 		$output = [];

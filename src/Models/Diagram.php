@@ -17,7 +17,10 @@ class Diagram
   protected $table = 'diagram';
 
   protected $connectionParams = [
-		'sqlite:/home/knight/Documents/Project/liquid/database/liquid.db', null, null,
+		// 'sqlite:/home/knight/Documents/Project/liquid/database/liquid.db', null, null,
+    'dsn' => 'mysql:host=localhost;dbname=liquid',
+    'username' => 'root',
+    'password' => 'password'
 		// [PDO::ATTR_PERSISTENT => true]
   ];
 
@@ -70,6 +73,7 @@ class Diagram
     $stmt->bindValue('nodes', isset($schema['nodes']) ? $schema['nodes'] : '', PDO::PARAM_STR);
     $stmt->bindValue('links', isset($schema['links']) ? $schema['links'] : '', PDO::PARAM_STR);
     if ($stmt->execute()) return $this->connection->lastInsertId();
+    throw new \Exception($this->connection->errorInfo()[2]);
   }
 
   public function update($id, array $schema)
@@ -81,7 +85,8 @@ class Diagram
     $stmt->bindValue('description', isset($schema['description']) ? $schema['description'] : '', PDO::PARAM_STR);
     $stmt->bindValue('nodes', isset($schema['nodes']) ? $schema['nodes'] : '', PDO::PARAM_STR);
     $stmt->bindValue('links', isset($schema['links']) ? $schema['links'] : '', PDO::PARAM_STR);
-    return $stmt->execute();
+    if ($stmt->execute()) return true;
+    throw new \Exception($this->connection->errorInfo()[2]);
   }
 
   public function delete($id)
@@ -89,6 +94,7 @@ class Diagram
     $sql = "DELETE FROM {$this->table} WHERE id = :id";
     $stmt = $this->connection->prepare($sql);
     $stmt->bindValue('id', $id, PDO::PARAM_INT);
-    return $stmt->execute();
+    if ($stmt->execute()) return true;
+    throw new \Exception($this->connection->errorInfo()[2]);
   }
 }

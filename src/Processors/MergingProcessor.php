@@ -6,6 +6,7 @@ use Liquid\Units\ProcessUnitInterface;
 
 class MergingProcessor extends BaseProcessor
 {
+	public static $alias = 'merging';
 
 	public function process(array $data, array $result_input)
 	{

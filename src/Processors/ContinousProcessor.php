@@ -6,6 +6,7 @@ use Liquid\Units\ProcessUnitInterface;
 
 class ContinousProcessor extends BaseProcessor
 {
+	public static $alias = 'continous';
 
 	public function process(array $data, array $result_input)
 	{

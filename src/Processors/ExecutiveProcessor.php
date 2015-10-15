@@ -11,6 +11,8 @@ use Liquid\Messages\Instruction;
 
 class ExecutiveProcessor extends MergingProcessor implements MessengerInterface
 {
+  public static $alias = 'executive';
+
   public function trigger(MessageInterface $message)
   {
     $this->node->handleMessage($message);

@@ -194,23 +194,23 @@
         // makePort("R", go.Spot.Right, true, true)
         makePort("B", go.Spot.Bottom, true, true)
       ));
-    myDiagram.nodeTemplateMap.add("Comment",
-      GO(go.Node, "Auto", nodeStyle(),
-        GO(go.Shape, "File",
-          { fill: "#EFFAB4", stroke: null }),
-        GO(go.TextBlock,
-          {
-            margin: 5,
-            maxSize: new go.Size(200, NaN),
-            wrap: go.TextBlock.WrapFit,
-            textAlign: "center",
-            editable: true,
-            font: "bold 12pt Helvetica, Arial, sans-serif",
-            stroke: '#454545'
-          },
-          new go.Binding("text", "config").makeTwoWay())
-        // no ports, because no links are allowed to connect with a comment
-      ));
+    // myDiagram.nodeTemplateMap.add("Comment",
+    //   GO(go.Node, "Auto", nodeStyle(),
+    //     GO(go.Shape, "File",
+    //       { fill: "#EFFAB4", stroke: null }),
+    //     GO(go.TextBlock,
+    //       {
+    //         margin: 5,
+    //         maxSize: new go.Size(200, NaN),
+    //         wrap: go.TextBlock.WrapFit,
+    //         textAlign: "center",
+    //         editable: true,
+    //         font: "bold 12pt Helvetica, Arial, sans-serif",
+    //         stroke: '#454545'
+    //       },
+    //       new go.Binding("text", "config").makeTwoWay())
+    //     // no ports, because no links are allowed to connect with a comment
+    //   ));
     // replace the default Link template in the linkTemplateMap
     myDiagram.linkTemplate =
       GO(go.Link,  // the whole link panel
@@ -262,15 +262,17 @@
           nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
           model: new go.GraphLinksModel([  // specify the contents of the Palette
             // { category: "Start", text: "Start" },
-            { name: "continous", category: "continous", config: { class: "ContinousProcessor", units: [] } },
-            { name: "parallel", category: "parallel", config: { class: "ParallelProcessor", units: [] } },
-            { name: "merging", category: "merging", config: { class: "MergingProcessor", units: [] } },
-            { name: "executive", category: "executive", config: { class: "ExecutiveProcessor", units: [] } },
+            { name: "continous", category: "continous", units: [] },
+            { name: "parallel", category: "parallel", units: [] },
+            { name: "merging", category: "merging", units: [] },
+            { name: "executive", category: "executive", units: [] },
             // { text: "???", figure: "Diamond" },
             // { category: "End", text: "End" },
             // { category: "Comment", text: "Comment" }
           ])
         });
+    listSchema();
+    getSchema(1);
   }
 
   // Make link labels visible if coming out of a "conditional" node.
@@ -290,29 +292,29 @@
   }
 
   function showDetail(node) {
-    var config = node.data.config ? parseConfig(node.data.config) : {};
-    document.getElementById("nodeDetail").value = config;
+    var units = node.data.units ? parseConfig(node.data.units) : [];
+    document.getElementById("nodeDetail").value = units;
     document.getElementById("nodeDetail").dataset.key = (node.data.key);
   }
 
-  function parseConfig(config) {
-    return JSON.stringify(config);
+  function parseConfig(units) {
+    return JSON.stringify(units);
   }
 
   function saveDetail() {
     // myDiagram.startTransaction("modify node detail");
     var key = document.getElementById("nodeDetail").dataset.key;
-    var config = document.getElementById("nodeDetail").value;
+    var units = document.getElementById("nodeDetail").value;
     var node = myDiagram.findNodeForKey(key);
-    node.data.config = (config) ? JSON.parse(config) : [];
+    node.data.units = (units) ? JSON.parse(units) : [];
     myDiagram.isModified = true;
     // myDiagram.commitTransaction("modify node detail");
   }
 
   // Show the diagram's model in JSON format that the user may edit
   function save() {
-    document.getElementById("nodeDataArray").value = JSON.stringify(myDiagram.model.nodeDataArray);
-    document.getElementById("linkDataArray").value = JSON.stringify(myDiagram.model.linkDataArray);
+    document.getElementById("nodeDataArray").value =    JSON.stringify(myDiagram.model.nodeDataArray);
+    document.getElementById("linkDataArray").value =    JSON.stringify(myDiagram.model.linkDataArray);
     myDiagram.isModified = false;
   }
 
@@ -349,12 +351,17 @@
       function (data) {
         data = JSON.parse(data);
         // get reference to select element
-        var sel = document.getElementById('schema-list');
+        var sel = document.getElementById('schemaList');
+        sel.size = 10;
+        sel.length = 0;
         for (var i = 0; i < data.length; i++) {
           var opt = document.createElement('option'); // create new option element
           // create text node to add to option element (opt)
           opt.appendChild( document.createTextNode(data[i].name) );
           opt.value = data[i].id; // set value property of opt
+          opt.addEventListener('click', function (e) {
+              getSchema(opt.value);
+          });
           sel.appendChild(opt); // add opt to end of select box (sel)
         }
       }
@@ -365,16 +372,37 @@
     ajax('GET', 'backend/get.php?id=' + id, {},
       function (data) {
         data = JSON.parse(data);
-        var nodes = document.getElementById('nodeDataArray');
-        var links = document.getElementById('linkDataArray');
-        nodes.value = data.nodes;
-        links.value = data.links;
+        document.getElementById('nodeDataArray').value = data.nodes;
+        document.getElementById('linkDataArray').value = data.links;
+        document.getElementById('schemaList').dataset.id = data.id;
       }
     )
   }
 
-  listSchema();
-  getSchema(1);
+  function createSchema()
+  {
+    ajax('POST', 'backend/create.php', {
+      'name': 'anonymous',
+      'description': 'new diagram',
+      'nodes': '[]',
+      'links': '[]'
+    }, function (data) {
+      listSchema();
+    })
+  }
+
+  function updateSchema()
+  {
+    ajax('PUT', 'backend/create.php', {
+      'id': document.getElementById('schemaList').dataset.id,
+      'name': 'anonymous',
+      'description': 'new diagram',
+      'nodes': '[]',
+      'links': '[]'
+    }, function (data) {
+      listSchema();
+    })
+  }
 </script>
 </head>
 <body onload="init()">
@@ -382,9 +410,11 @@
   <div style="width:100%; white-space:nowrap;">
     <span style="display: inline-block; vertical-align: top; padding: 5px; width:10%">
       <div id="myPalette" style="border: solid 1px gray; height: 300px"></div>
-      <select id="schema-list" onload="listSchema()" style="width:100%">
+      <select id="schemaList" onload="listSchema()" style="width: 100%; display: block">
       </select>
-
+      <button id="createButton" onclick="createSchema()">N</button>
+      <button id="updateButton" onclick="updateSchema()">U</button>
+      <button id="deleteButton" onclick="deleteSchema()">X</button>
     </span>
 
     <span style="display: inline-block; vertical-align: top; padding: 5px; width:50%">
@@ -393,12 +423,12 @@
 
     <span style="display: inline-block; vertical-align: top; padding: 5px; width:36%">
       <div id="myPanel" style="border: solid 1px gray; height: 600px">
-        <textarea id="nodeDetail" style="width:100%; height:175px"></textarea><br/>
-        <textarea id="nodeDataArray" style="width:100%;height:175px">[]</textarea><br/>
-        <textarea id="linkDataArray" style="width:100%;height:175px">[]</textarea><br/>
+        <textarea id="nodeDetail" style="width: 100%; height: 175px; display: block">[]</textarea>
+        <textarea id="nodeDataArray" style="width: 100%; height: 175px; display: block">[]</textarea>
+        <textarea id="linkDataArray" style="width: 100%; height: 175px; display: block">[]</textarea>
         <button id="saveDetailButton" onclick="saveDetail()" disabled>Save Detail</button>
-        <button id="SaveButton" onclick="save()">Save</button>
-        <button onclick="load()">Load</button>
+        <button id="saveButton" onclick="save()">Save</button>
+        <button id="loadButton" onclick="load()">Load</button>
       </div>
     </span>
   </div>

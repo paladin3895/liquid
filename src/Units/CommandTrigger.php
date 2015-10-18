@@ -3,11 +3,14 @@
 namespace Liquid\Units;
 
 use Liquid\Messages\Commands\DisplayCommand;
+use Respect\Validation\Validator;
 use ReflectionClass;
 use Exception;
 
 class CommandTrigger extends BaseUnit implements FormatInterface
 {
+  use \Liquid\Builders\ValidationTrait;
+
   protected $command;
   protected $conditions;
 
@@ -24,10 +27,8 @@ class CommandTrigger extends BaseUnit implements FormatInterface
 
   public function process(array $record)
   {
-    foreach ($this->conditions as $key => $value) {
-      if (array_key_exists($key, $record) && $record[$key] == $value)
-        $this->processor->trigger($this->command);
-    }
+    $conditions = $this->makeConditions($this->conditions);
+    if ($conditions($record)) $this->processor->trigger($this->command);
     return $record;
   }
 

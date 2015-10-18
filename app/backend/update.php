@@ -1,5 +1,6 @@
 <?php
 require __DIR__ . '/../../vendor/autoload.php';
+use Liquid\Helpers\JsonAdapter;
 
 if ($_SERVER['REQUEST_METHOD'] != 'PUT') return false;
 parse_str(file_get_contents('php://input'), $params);
@@ -9,4 +10,4 @@ foreach ($format as $key) {
 }
 $diagram = new Liquid\Models\Diagram;
 header('Content-Type: application/json');
-echo json_encode($diagram->update($params['id'], $params));
+echo json_encode($diagram->update($params['id'], JsonAdapter::toBackend($params)));

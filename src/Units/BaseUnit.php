@@ -38,6 +38,4 @@ abstract class BaseUnit implements ProcessUnitInterface
   }
 
   abstract public function process(array $record);
-
-  abstract public static function getFormat();
 }

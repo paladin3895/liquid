@@ -4,6 +4,5 @@ require __DIR__ . '/vendor/autoload.php';
 $diagram = new Liquid\Models\Diagram;
 $schema = new Liquid\Schema;
 
-$registry = $schema->build($diagram->get(1));
-
-var_dump($registry->process(['test' => ['name' => 'liquid with come-stay']]));
+$registry = $schema->build($diagram->get(5));
+var_dump($registry->process(['test' => ['title' => 'liquid with come-stay']]));

@@ -48,9 +48,19 @@ abstract class BaseProcessor
 		$this->node->setResult($result);
 	}
 
+	public function getResult()
+	{
+		return $this->node->getResult();
+	}
+
 	public function setOutput(array $output)
 	{
 		$this->node->setOutput($output);
+	}
+
+	public function getOutput()
+	{
+		return $this->node->getOutput();
 	}
 
 	/*

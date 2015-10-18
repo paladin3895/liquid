@@ -2,11 +2,10 @@
 
 namespace Liquid\Builders;
 
-use Respect\Validation\Validator;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage as Expression;
-
 class ClosureBuilder implements BuilderInterface
 {
+  use ValidationTrait, ExpressionTrait;
+
   protected $format = [
     'class' => 'string',
     'conditions' => 'array',
@@ -25,60 +24,6 @@ class ClosureBuilder implements BuilderInterface
    *     'number' => 'number + 1',
    *   ]
    */
-
-  public function makeConditions(array $conditions)
-  {
-    $closures = [];
-    foreach ($conditions as $key => $evaluations) {
-      $closures[] = $this->makeEvaluations($key, $evaluations);
-    }
-    return function(array $record) use ($closures) {
-      foreach ($closures as $closure) {
-        if (!$closure($record)) return false;
-      }
-      return true;
-    };
-  }
-
-  public function makeEvaluations($key, $evaluations)
-  {
-    $evaluations = explode(',', $evaluations);
-    $validator = new Validator;
-    foreach ($evaluations as $evaluation) {
-      $evaluation = explode(':', $evaluation);
-      $type = $evaluation[0];
-      $operands = explode('|', $evaluation[1]);
-      $validator = call_user_func_array([$validator, $type], $operands);
-    }
-    return function (array $record) use ($key, $validator) {
-      return (new Validator)->key($key, $validator)->validate($record);
-    };
-  }
-
-  public function makeComputations(array $computations)
-  {
-
-    $computator = new Expression;
-
-    return function (array $record, array $result) use ($computations, $computator) {
-
-      $collection = array_merge($result, $record);
-
-      foreach ($computations as $key => $expression) {
-        $parameters = [];
-        if (preg_match_all('#[a-zA-Z]+#', $expression, $matches))
-          $parameters = $matches[0];
-
-        foreach ($parameters as $parameter) {
-          if (!isset($collection[$parameter])) $collection[$parameter] = 0;
-        }
-        if (!isset($result[$key])) $result[$key] = 0;
-
-        $result[$key] = $computator->evaluate($expression, $collection);
-      }
-      return $result;
-    };
-  }
 
   public function make(array $config)
   {

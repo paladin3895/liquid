@@ -272,7 +272,7 @@
           ])
         });
     listSchema();
-    getSchema(1);
+    getFormats();
   }
 
   // Make link labels visible if coming out of a "conditional" node.
@@ -302,13 +302,14 @@
   }
 
   function saveDetail() {
-    // myDiagram.startTransaction("modify node detail");
+    myDiagram.startTransaction("modify node detail");
     var key = document.getElementById("nodeDetail").dataset.key;
     var units = document.getElementById("nodeDetail").value;
     var node = myDiagram.findNodeForKey(key);
     node.data.units = (units) ? JSON.parse(units) : [];
     myDiagram.isModified = true;
-    // myDiagram.commitTransaction("modify node detail");
+    save();
+    myDiagram.commitTransaction("modify node detail");
   }
 
   // Show the diagram's model in JSON format that the user may edit
@@ -328,8 +329,12 @@
   function ajax(method, url, data, callback) {
     var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
-        if (xhttp.readyState == 4 && xhttp.status == 200) {
-         callback(xhttp.responseText);
+        if (xhttp.readyState == 4) {
+          if (xhttp.status == 200) {
+            callback(xhttp.responseText);
+          } else {
+            alert("**error**");
+          }
         }
       }
       xhttp.open(method, url, true);
@@ -338,10 +343,11 @@
   }
 
   function serialize(data) {
-    var format = ['id', 'name', 'description', 'nodes', 'links'];
+    var format = ['id', 'name', 'description', 'nodes', 'links', 'test'];
     var string = '';
     for (var i = 0; i < format.length; i++) {
-      if (data[format[i]]) string += format[i] + '=' + data[format[i]] + '&';
+      if (data[format[i]]) string +=
+        encodeURIComponent(format[i]) + '=' + encodeURIComponent(data[format[i]]) + '&';
     }
     return string;
   }
@@ -352,16 +358,24 @@
         data = JSON.parse(data);
         // get reference to select element
         var sel = document.getElementById('schemaList');
-        sel.size = 10;
-        sel.length = 0;
+        sel.options.length = 0;
+        sel.onchange = function () {
+          var selected = this.options[this.selectedIndex].value;
+          document.getElementById('schemaDetail').dataset.id = selected;
+          getSchema(selected);
+        };
+
+        var opt_default = document.createElement('option');
+        opt_default.selected = true;
+        opt_default.disabled = true;
+        opt_default.appendChild(document.createTextNode('-- select a schema --'));
+        sel.appendChild(opt_default);
+
         for (var i = 0; i < data.length; i++) {
           var opt = document.createElement('option'); // create new option element
           // create text node to add to option element (opt)
           opt.appendChild( document.createTextNode(data[i].name) );
           opt.value = data[i].id; // set value property of opt
-          opt.addEventListener('click', function (e) {
-              getSchema(opt.value);
-          });
           sel.appendChild(opt); // add opt to end of select box (sel)
         }
       }
@@ -372,15 +386,17 @@
     ajax('GET', 'backend/get.php?id=' + id, {},
       function (data) {
         data = JSON.parse(data);
+        document.getElementById('schemaDetail').dataset.id = data.id;
+        document.getElementById('schemaName').value = data.name;
+        document.getElementById('schemaDescription').value = data.description;
         document.getElementById('nodeDataArray').value = data.nodes;
         document.getElementById('linkDataArray').value = data.links;
-        document.getElementById('schemaList').dataset.id = data.id;
+        document.getElementById('schemaDetail').dataset.id = data.id;
       }
     )
   }
 
-  function createSchema()
-  {
+  function createSchema() {
     ajax('POST', 'backend/create.php', {
       'name': 'anonymous',
       'description': 'new diagram',
@@ -391,17 +407,63 @@
     })
   }
 
-  function updateSchema()
-  {
-    ajax('PUT', 'backend/create.php', {
-      'id': document.getElementById('schemaList').dataset.id,
-      'name': 'anonymous',
-      'description': 'new diagram',
-      'nodes': '[]',
-      'links': '[]'
+  function updateSchema() {
+    ajax('PUT', 'backend/update.php', {
+      'id': document.getElementById('schemaDetail').dataset.id,
+      'name': document.getElementById('schemaName').value,
+      'description': document.getElementById('schemaDescription').value,
+      'nodes': document.getElementById('nodeDataArray').value,
+      'links': document.getElementById('linkDataArray').value
     }, function (data) {
       listSchema();
     })
+  }
+
+  function deleteSchema() {
+    ajax('DELETE', 'backend/delete.php', {
+      'id': document.getElementById('schemaDetail').dataset.id
+    }, function (data) {
+      listSchema();
+    })
+  }
+
+  function getFormats() {
+    ajax('GET', 'backend/formats.php', {},
+    function (data) {
+      parseFormats(data);
+    })
+  }
+
+  function parseFormats(data) {
+    data = JSON.parse(data);
+    var sel = document.getElementById('selectClass');
+    sel.onchange = function () {
+      var selected = this.options[this.selectedIndex].value
+      document.getElementById('unitDetail').value = JSON.stringify(data[selected]);
+    };
+    for (unit in data) {
+      var opt = document.createElement('option');
+      opt.value = unit;
+      opt.appendChild(document.createTextNode(unit));
+      sel.appendChild(opt);
+    }
+  }
+
+  function createUnit() {
+    var detail = JSON.parse(document.getElementById('nodeDetail').value);
+    detail.push(JSON.parse(document.getElementById('unitDetail').value));
+    document.getElementById('nodeDetail').value = JSON.stringify(detail);
+  }
+
+  function test() {
+    var test = {
+      "id": document.getElementById('schemaDetail').dataset.id,
+      "test": document.getElementById('testData').value
+    };
+    ajax('POST', 'backend/test.php', test,
+    function (data) {
+      document.getElementById('testResult').innerHTML = data;
+    });
   }
 </script>
 </head>
@@ -410,11 +472,14 @@
   <div style="width:100%; white-space:nowrap;">
     <span style="display: inline-block; vertical-align: top; padding: 5px; width:10%">
       <div id="myPalette" style="border: solid 1px gray; height: 300px"></div>
-      <select id="schemaList" onload="listSchema()" style="width: 100%; display: block">
-      </select>
-      <button id="createButton" onclick="createSchema()">N</button>
-      <button id="updateButton" onclick="updateSchema()">U</button>
-      <button id="deleteButton" onclick="deleteSchema()">X</button>
+      <select id="schemaList" style="width: 100%; display: block;"></select>
+      <div id="schemaDetail" style="width: 100%; display: block">
+        <input id="schemaName" type="text" style="width: 100%; display: block;"/>
+        <textarea id="schemaDescription" style="width: 100%; display: block;"></textarea>
+      </div>
+      <button id="createButton" onclick="createSchema()">+</button>
+      <button id="updateButton" onclick="updateSchema()">=</button>
+      <button id="deleteButton" onclick="deleteSchema()">x</button>
     </span>
 
     <span style="display: inline-block; vertical-align: top; padding: 5px; width:50%">
@@ -423,18 +488,24 @@
 
     <span style="display: inline-block; vertical-align: top; padding: 5px; width:36%">
       <div id="myPanel" style="border: solid 1px gray; height: 600px">
-        <textarea id="nodeDetail" style="width: 100%; height: 175px; display: block">[]</textarea>
-        <textarea id="nodeDataArray" style="width: 100%; height: 175px; display: block">[]</textarea>
-        <textarea id="linkDataArray" style="width: 100%; height: 175px; display: block">[]</textarea>
-        <button id="saveDetailButton" onclick="saveDetail()" disabled>Save Detail</button>
-        <button id="saveButton" onclick="save()">Save</button>
-        <button id="loadButton" onclick="load()">Load</button>
+        <select id="selectClass" style="width: 50%; display: inline-block;">
+          <option disabled selected> -- select an unit -- </option>
+        </select>
+        <button id="createUnit" onclick="createUnit()">Create</button>
+        <textarea id="unitDetail" style="width: 100%; display: block;"></textarea>
+
+        <textarea id="nodeDetail" style="width: 100%; height: 175px; display: block;">[]</textarea>
+        <textarea id="nodeDataArray" style="width: 100%; height: 175px; display: none;">[]</textarea>
+        <textarea id="linkDataArray" style="width: 100%; height: 175px; display: none;">[]</textarea>
+        <!-- <button id="saveDetailButton" onclick="saveDetail()">Save Detail</button> -->
+        <button id="saveButton" onclick="saveDetail()">Save</button>
+        <button id="loadButton" onclick="load()">Load</button><br/>
+        <textarea id="testData" style="width: 60%; height: 175px; display: inline-block;"></textarea>
+        <textarea id="testResult" style="width: 36%; height: 175px; display: inline-block;"></textarea><br/>
+        <button id="test" onclick="test()">Test</button>
       </div>
     </span>
   </div>
-
-
-
 </div>
 </body>
 </html>

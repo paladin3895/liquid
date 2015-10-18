@@ -3,16 +3,22 @@
 namespace Liquid\Units;
 
 use Liquid\Messages\Commands\DisplayCommand;
+use ReflectionClass;
+use Exception;
 
-class CommandTrigger extends BaseUnit implements ProcessUnitInterface
+class CommandTrigger extends BaseUnit implements FormatInterface
 {
   protected $command;
   protected $conditions;
 
-  public function __construct(array $conditions, array $receivers, array $actions, $name = null)
+  protected $namespace = "Liquid\Messages\Commands\\";
+
+  public function __construct(array $conditions, array $receivers, $command, $name = null)
   {
     parent::__construct($name);
-    $this->command = new DisplayCommand($receivers, $actions);
+    $reflection = new ReflectionClass($this->namespace . $command);
+    if (!$reflection->isInstantiable()) throw new Exception('invalid command');
+    $this->command = $reflection->newInstance($receivers);
     $this->conditions = $conditions;
   }
 
@@ -30,8 +36,7 @@ class CommandTrigger extends BaseUnit implements ProcessUnitInterface
     return [
       'conditions' => 'array',
       'receivers' => 'array',
-      'actions' => 'array',
-      'name' => 'string',
+      'command' => 'string',
     ];
   }
 }

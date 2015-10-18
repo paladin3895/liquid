@@ -68,22 +68,6 @@ abstract class BaseNode
 		return $this->output;
 	}
 
-	protected function _push()
-	{
-		foreach ($this->nexts as $node) {
-			$node->input[$this->name] = $this->output;
-		}
-	}
-
-	protected function _pull()
-	{
-		if ($this->previouses->count() == 0) $this->input['void'] = ['placeholder'];
-		foreach ($this->previouses as $node) {
-			if (empty($node->output)) continue;
-			$this->input[$node->name] = $node->output;
-		}
-	}
-
 	use RegisteringTrait, ConnectingTrait, ProcessingTrait;
 	use TriggeringTrait;
 }

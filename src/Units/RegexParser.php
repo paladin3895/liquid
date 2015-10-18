@@ -2,7 +2,7 @@
 
 namespace Liquid\Units;
 
-class RegexParser extends BaseUnit
+class RegexParser extends BaseUnit implements FormatInterface
 {
   protected $signature;
 
@@ -30,7 +30,6 @@ class RegexParser extends BaseUnit
     return [
       'key' => 'string',
       'signature' => 'string',
-      'name' => 'string',
     ];
   }
 }

@@ -10,29 +10,17 @@ trait ConnectingTrait
   {
     if (!$this->nexts->contains($next)) $this->nexts->attach($next);
     if (!$next->previouses->contains($this)) $next->previouses->attach($this);
-    $next->depth = ($next->depth > $this->depth) ? $next->depth : ($this->depth + 1);
+    $this->_update();
   }
 
-  public function backward(BaseNode $previous)
+  protected function _update()
   {
-    if (!$this->previouses->contains($previous)) $this->previouses->attach($previous);
-    if (!$previous->nexts->contains($this)) $previous->nexts->attach($this);
-    $this->depth = ($this->depth > $previous->depth) ? $this->depth : ($previous->depth + 1);
-  }
-
-  public function hub(array $previouses)
-  {
-    foreach ($previouses as $node) {
-      if (!($node instanceof BaseNode)) throw new Exception('invalid node type');
-      $this->backward($node);
+    foreach ($this->previouses as $previous) {
+      if ($previous->depth < $this->depth) continue;
+      $this->depth = $previous->depth + 1;
     }
-  }
-
-  public function split(array $nexts)
-  {
-    foreach ($nexts as $node) {
-      if (!($node instanceof BaseNode)) throw new Exception('invalid node type');
-      $this->forward($node);
+    foreach ($this->nexts as $next) {
+      $next->_update();
     }
   }
 
@@ -45,7 +33,7 @@ trait ConnectingTrait
 
   protected function _pull()
   {
-    if ($this->previouses->count() == 0) $this->input['void'] = ['placeholder'];
+    // if ($this->previouses->count() == 0) $this->input['void'] = ['placeholder'];
     foreach ($this->previouses as $node) {
       if (empty($node->output)) continue;
       $this->input[$node->name] = $node->output;

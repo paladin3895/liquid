@@ -2,7 +2,7 @@
 
 namespace Liquid\Units;
 
-class InputLogger extends BaseUnit
+class InputLogger extends BaseUnit implements FormatInterface
 {
   public function process(array $record)
   {
@@ -20,7 +20,7 @@ class InputLogger extends BaseUnit
   public static function getFormat()
   {
     return [
-      'name' => 'string',
+
     ];
   }
 }

@@ -31,7 +31,6 @@ class ProcessorBuilder implements BuilderInterface
   {
     $config = $this->_format($config);
     if (!$config) return;
-
     $class = new ReflectionClass($this->namespace . $config['class']);
     if (!$class->isSubclassOf(BaseProcessor::class)) return;
     if (!$class->isInstantiable()) return;
@@ -40,7 +39,7 @@ class ProcessorBuilder implements BuilderInterface
     foreach ($config['units'] as $unitConfig) {
       if (!isset($unitConfig['class'])) continue;
 
-      if ($unitConfig['class'] == 'function') {
+      if ($unitConfig['class'] == 'Closure') {
         $unit = $this->closureBuilder->make($unitConfig);
         if ($unit) $processor->chain($unit);
       } else {

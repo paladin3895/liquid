@@ -13,6 +13,23 @@ class UnitBuilder implements BuilderInterface
 
   protected $namespace = 'Liquid\Units\\';
 
+  public static function getFormats()
+  {
+    $units_path = dirname(__DIR__) . "/Units/*.php";
+    foreach (glob($units_path) as $filename)
+    {
+      include_once $filename;
+    }
+
+    $formats = [];
+    foreach (get_declared_classes() as $class) {
+      if (!preg_match('#^Liquid\\\Units\\\(\w+)#', $class, $matches)) continue;
+      if (!is_callable([$class, 'getFormat'])) continue;
+      $formats[$matches[1]] = $class::getFormat();
+    }
+    return $formats;
+  }
+
   public function make(array $config)
   {
     $config = $this->_format($config);
@@ -21,7 +38,7 @@ class UnitBuilder implements BuilderInterface
     if (!$class->implementsInterface(ProcessUnitInterface::class)) return;
     if (!$class->isInstantiable()) return;
 
-    $unit = $class->newInstanceArgs($config['arguments']);
+    $unit = $class->newInstanceArgs($config['arguments'] ? : []);
     return $unit;
   }
 

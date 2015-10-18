@@ -30,7 +30,6 @@ class Diagram
   {
     $pdo = new ReflectionClass(PDO::class);
     $this->connection = $pdo->newInstanceArgs($this->connectionParams);
-    // $this->_migration();
   }
 
   public function migration()

@@ -6,8 +6,6 @@ use Liquid\Processors\BaseProcessor;
 
 interface ProcessUnitInterface
 {
-	public static function getFormat();
-
 	/*
 	 * $input into the process unit with format
 	 * ['key' => 'scalar value', ...]

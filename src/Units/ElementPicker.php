@@ -2,7 +2,7 @@
 
 namespace Liquid\Units;
 
-class ElementPicker extends BaseUnit
+class ElementPicker extends BaseUnit implements FormatInterface
 {
 
   protected $elements = [];
@@ -11,7 +11,6 @@ class ElementPicker extends BaseUnit
   {
     return [
       'elements' => 'array',
-      'name' => 'string',
     ];
   }
 

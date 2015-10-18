@@ -2,7 +2,7 @@
 
 namespace Liquid\Units;
 
-class DummyDataProvider extends BaseUnit
+class DummyDataProvider extends BaseUnit implements ProcessUnitInterface, FormatInterface
 {
 
 	protected $data;
@@ -22,7 +22,6 @@ class DummyDataProvider extends BaseUnit
 	{
 		return [
 			'data' => 'array',
-			'name' => 'string',
 		];
 	}
 }

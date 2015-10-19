@@ -1,3 +1,4 @@
+
 function init() {
   var GO = go.GraphObject.make;  // for conciseness in defining templates
   myDiagram =
@@ -185,23 +186,23 @@ function init() {
       // makePort("R", go.Spot.Right, true, true)
       makePort("B", go.Spot.Bottom, true, true)
     ));
-  myDiagram.nodeTemplateMap.add("Comment",
-    GO(go.Node, "Auto", nodeStyle(),
-      GO(go.Shape, "File",
-        { fill: "#EFFAB4", stroke: null }),
-      GO(go.TextBlock,
-        {
-          margin: 5,
-          maxSize: new go.Size(200, NaN),
-          wrap: go.TextBlock.WrapFit,
-          textAlign: "center",
-          editable: true,
-          font: "bold 12pt Helvetica, Arial, sans-serif",
-          stroke: '#454545'
-        },
-        new go.Binding("text", "config").makeTwoWay())
-      // no ports, because no links are allowed to connect with a comment
-    ));
+  // myDiagram.nodeTemplateMap.add("Comment",
+  //   GO(go.Node, "Auto", nodeStyle(),
+  //     GO(go.Shape, "File",
+  //       { fill: "#EFFAB4", stroke: null }),
+  //     GO(go.TextBlock,
+  //       {
+  //         margin: 5,
+  //         maxSize: new go.Size(200, NaN),
+  //         wrap: go.TextBlock.WrapFit,
+  //         textAlign: "center",
+  //         editable: true,
+  //         font: "bold 12pt Helvetica, Arial, sans-serif",
+  //         stroke: '#454545'
+  //       },
+  //       new go.Binding("text", "config").makeTwoWay())
+  //     // no ports, because no links are allowed to connect with a comment
+  //   ));
   // replace the default Link template in the linkTemplateMap
   myDiagram.linkTemplate =
     GO(go.Link,  // the whole link panel
@@ -253,18 +254,17 @@ function init() {
         nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
         model: new go.GraphLinksModel([  // specify the contents of the Palette
           // { category: "Start", text: "Start" },
-          { name: "continous", category: "continous", config: { class: "ContinousProcessor", units: [] } },
-          { name: "parallel", category: "parallel", config: { class: "ParallelProcessor", units: [] } },
-          { name: "merging", category: "merging", config: { class: "MergingProcessor", units: [] } },
-          { name: "executive", category: "executive", config: { class: "ExecutiveProcessor", units: [] } },
+          { name: "continous", category: "continous", units: [] },
+          { name: "parallel", category: "parallel", units: [] },
+          { name: "merging", category: "merging", units: [] },
+          { name: "executive", category: "executive", units: [] },
           // { text: "???", figure: "Diamond" },
           // { category: "End", text: "End" },
           // { category: "Comment", text: "Comment" }
         ])
       });
-
   listSchema();
-  getSchema();
+  getFormats();
 }
 
 // Make link labels visible if coming out of a "conditional" node.
@@ -284,29 +284,30 @@ function showPorts(node, show) {
 }
 
 function showDetail(node) {
-  var config = node.data.config ? parseConfig(node.data.config) : {};
-  document.getElementById("nodeDetail").value = config;
+  var units = node.data.units ? parseConfig(node.data.units) : [];
+  document.getElementById("nodeDetail").value = units;
   document.getElementById("nodeDetail").dataset.key = (node.data.key);
 }
 
-function parseConfig(config) {
-  return JSON.stringify(config);
+function parseConfig(units) {
+  return JSON.stringify(units);
 }
 
 function saveDetail() {
-  // myDiagram.startTransaction("modify node detail");
+  myDiagram.startTransaction("modify node detail");
   var key = document.getElementById("nodeDetail").dataset.key;
-  var config = document.getElementById("nodeDetail").value;
+  var units = document.getElementById("nodeDetail").value;
   var node = myDiagram.findNodeForKey(key);
-  node.data.config = (config) ? JSON.parse(config) : [];
+  node.data.units = (units) ? JSON.parse(units) : [];
   myDiagram.isModified = true;
-  // myDiagram.commitTransaction("modify node detail");
+  save();
+  myDiagram.commitTransaction("modify node detail");
 }
 
 // Show the diagram's model in JSON format that the user may edit
 function save() {
-  document.getElementById("nodeDataArray").value = JSON.stringify(myDiagram.model.nodeDataArray);
-  document.getElementById("linkDataArray").value = JSON.stringify(myDiagram.model.linkDataArray);
+  document.getElementById("nodeDataArray").value =    JSON.stringify(myDiagram.model.nodeDataArray);
+  document.getElementById("linkDataArray").value =    JSON.stringify(myDiagram.model.linkDataArray);
   myDiagram.isModified = false;
 }
 
@@ -320,8 +321,12 @@ function load() {
 function ajax(method, url, data, callback) {
   var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
-      if (xhttp.readyState == 4 && xhttp.status == 200) {
-       callback(xhttp.responseText);
+      if (xhttp.readyState == 4) {
+        if (xhttp.status == 200) {
+          callback(xhttp.responseText);
+        } else {
+          alert("**error**");
+        }
       }
     }
     xhttp.open(method, url, true);
@@ -330,10 +335,11 @@ function ajax(method, url, data, callback) {
 }
 
 function serialize(data) {
-  var format = ['id', 'name', 'description', 'nodes', 'links'];
+  var format = ['id', 'name', 'description', 'nodes', 'links', 'test'];
   var string = '';
   for (var i = 0; i < format.length; i++) {
-    if (data[format[i]]) string += format[i] + '=' + data[format[i]] + '&';
+    if (data[format[i]]) string +=
+      encodeURIComponent(format[i]) + '=' + encodeURIComponent(data[format[i]]) + '&';
   }
   return string;
 }
@@ -343,7 +349,20 @@ function listSchema() {
     function (data) {
       data = JSON.parse(data);
       // get reference to select element
-      var sel = document.getElementById('schema-list');
+      var sel = document.getElementById('schemaList');
+      sel.options.length = 0;
+      sel.onchange = function () {
+        var selected = this.options[this.selectedIndex].value;
+        document.getElementById('schemaDetail').dataset.id = selected;
+        getSchema(selected);
+      };
+
+      var opt_default = document.createElement('option');
+      opt_default.selected = true;
+      opt_default.disabled = true;
+      opt_default.appendChild(document.createTextNode('-- select a schema --'));
+      sel.appendChild(opt_default);
+
       for (var i = 0; i < data.length; i++) {
         var opt = document.createElement('option'); // create new option element
         // create text node to add to option element (opt)
@@ -359,11 +378,82 @@ function getSchema(id) {
   ajax('GET', 'backend/get.php?id=' + id, {},
     function (data) {
       data = JSON.parse(data);
-      var nodes = document.getElementById('nodeDataArray');
-      var links = document.getElementById('linkDataArray');
-      console.log(data.nodes);
-      nodes.value = data.nodes;
-      links.value = data.links;
+      document.getElementById('schemaDetail').dataset.id = data.id;
+      document.getElementById('schemaName').value = data.name;
+      document.getElementById('schemaDescription').value = data.description;
+      document.getElementById('nodeDataArray').value = data.nodes;
+      document.getElementById('linkDataArray').value = data.links;
+      document.getElementById('schemaDetail').dataset.id = data.id;
     }
   )
+}
+
+function createSchema() {
+  ajax('POST', 'backend/create.php', {
+    'name': 'anonymous',
+    'description': 'new diagram',
+    'nodes': '[]',
+    'links': '[]'
+  }, function (data) {
+    listSchema();
+  })
+}
+
+function updateSchema() {
+  ajax('PUT', 'backend/update.php', {
+    'id': document.getElementById('schemaDetail').dataset.id,
+    'name': document.getElementById('schemaName').value,
+    'description': document.getElementById('schemaDescription').value,
+    'nodes': document.getElementById('nodeDataArray').value,
+    'links': document.getElementById('linkDataArray').value
+  }, function (data) {
+    listSchema();
+  })
+}
+
+function deleteSchema() {
+  ajax('DELETE', 'backend/delete.php', {
+    'id': document.getElementById('schemaDetail').dataset.id
+  }, function (data) {
+    listSchema();
+  })
+}
+
+function getFormats() {
+  ajax('GET', 'backend/formats.php', {},
+  function (data) {
+    parseFormats(data);
+  })
+}
+
+function parseFormats(data) {
+  data = JSON.parse(data);
+  var sel = document.getElementById('selectClass');
+  sel.onchange = function () {
+    var selected = this.options[this.selectedIndex].value
+    document.getElementById('unitDetail').value = JSON.stringify(data[selected]);
+  };
+  for (unit in data) {
+    var opt = document.createElement('option');
+    opt.value = unit;
+    opt.appendChild(document.createTextNode(unit));
+    sel.appendChild(opt);
+  }
+}
+
+function createUnit() {
+  var detail = JSON.parse(document.getElementById('nodeDetail').value);
+  detail.push(JSON.parse(document.getElementById('unitDetail').value));
+  document.getElementById('nodeDetail').value = JSON.stringify(detail);
+}
+
+function test() {
+  var test = {
+    "id": document.getElementById('schemaDetail').dataset.id,
+    "test": document.getElementById('testData').value
+  };
+  ajax('POST', 'backend/test.php', test,
+  function (data) {
+    document.getElementById('testResult').innerHTML = data;
+  });
 }

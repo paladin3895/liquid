@@ -12,9 +12,7 @@
     "require": {
         "respect/validation": "^1.0@dev",
         "symfony/expression-language": "^3.0@dev",
-        "phpunit/phpunit": "5.0.*",
-        "lichtner/fluentpdo": "dev-master",
-        "doctrine/dbal": "^2.6@dev"
+        "phpunit/phpunit": "5.0.*"
     },
     "autoload": {
       "psr-4": {"Liquid\\": "src/"}

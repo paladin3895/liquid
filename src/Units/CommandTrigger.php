@@ -9,7 +9,7 @@ use Exception;
 
 class CommandTrigger extends BaseUnit implements FormatInterface
 {
-  use \Liquid\Builders\ValidationTrait;
+  use \Liquid\Builders\Traits\ValidationTrait;
 
   protected $command;
   protected $conditions;

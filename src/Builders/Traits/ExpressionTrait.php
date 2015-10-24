@@ -1,5 +1,5 @@
 <?php
-namespace Liquid\Builders;
+namespace Liquid\Builders\Traits;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage as Expression;
 

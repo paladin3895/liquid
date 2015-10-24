@@ -1,6 +1,8 @@
 <?php
 
-namespace Liquid\Nodes;
+namespace Liquid\Nodes\Traits;
+
+use Liquid\Nodes\BaseNode;
 
 trait ConnectingTrait
 {

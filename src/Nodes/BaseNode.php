@@ -9,6 +9,8 @@ use SplObjectStorage;
 
 abstract class BaseNode
 {
+	use Traits\RegisteringTrait, Traits\ConnectingTrait, Traits\ProcessingTrait, Traits\TriggeringTrait;
+
 	const STATUS_ALIVE				= 0b001;
 	const STATUS_ACTIVE				= 0b010;
 	const STATUS_INITIALIZED	= 0b100;
@@ -68,6 +70,4 @@ abstract class BaseNode
 		return $this->output;
 	}
 
-	use RegisteringTrait, ConnectingTrait, ProcessingTrait;
-	use TriggeringTrait;
 }

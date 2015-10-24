@@ -2,9 +2,11 @@
 
 namespace Liquid\Builders;
 
+use Exception;
+
 class ClosureBuilder implements BuilderInterface
 {
-  use ValidationTrait, ExpressionTrait;
+  use Traits\ValidationTrait, Traits\ExpressionTrait, Traits\FormatTrait;
 
   protected $format = [
     'class' => 'string',
@@ -28,7 +30,6 @@ class ClosureBuilder implements BuilderInterface
   public function make(array $config)
   {
     $config = $this->_format($config);
-    if (!$config) return;
 
     $conditions = $this->makeConditions($config['conditions']);
     $computations = $this->makeComputations($config['computations']);
@@ -36,16 +37,5 @@ class ClosureBuilder implements BuilderInterface
       if ($conditions($record)) return $computations($record, $result);
       return $result;
     };
-  }
-
-  protected function _format(array $config)
-  {
-    $output = [];
-    foreach ($this->format as $key => $type) {
-      if (!array_key_exists($key, $config)) return false;
-      if (gettype($config[$key]) != $type) return false;
-      $output[$key] = $config[$key];
-    }
-    return $output;
   }
 }

@@ -4,9 +4,12 @@ namespace Liquid\Builders;
 use Liquid\Builders\BuilderInterface;
 use Liquid\Nodes\BaseNode;
 use ReflectionClass;
+use Exception;
 
 class NodeBuilder implements BuilderInterface
 {
+  use Traits\FormatTrait;
+
   protected $class;
 
   protected $format = [
@@ -21,19 +24,12 @@ class NodeBuilder implements BuilderInterface
     if (!$config) return;
 
     $class = new ReflectionClass($this->namespace);
-    if (!$class->isSubclassOf('Liquid\Nodes\BaseNode')) return;
-    if (!$class->isInstantiable()) return;
-    return $class->newInstance($config['name']);
-  }
+    if (!$class->isSubclassOf('Liquid\Nodes\BaseNode'))
+      throw new Exception("invalid node class provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
 
-  protected function _format(array $config)
-  {
-    $output = [];
-    foreach ($this->format as $key => $type) {
-      if (!array_key_exists($key, $config)) return false;
-      if (gettype($config[$key]) != $type) return false;
-      $output[$key] = $config[$key];
-    }
-    return $output;
+    if (!$class->isInstantiable())
+      throw new Exception("uninstantiable node class provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
+
+    return $class->newInstance($config['name']);
   }
 }

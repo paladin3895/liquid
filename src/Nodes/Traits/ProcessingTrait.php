@@ -1,7 +1,8 @@
 <?php
 
-namespace Liquid\Nodes;
+namespace Liquid\Nodes\Traits;
 
+use Liquid\Nodes\BaseNode;
 use Liquid\Processors\BaseProcessor;
 
 trait ProcessingTrait
@@ -17,11 +18,11 @@ trait ProcessingTrait
 
   public function process()
   {
-    $this->_pull();
+    // $this->_pull();
     if ($this->status & self::STATUS_ACTIVE)
       $this->processor->process($this->getInput(), $this->getResult());
     else
       throw new \Exception('node ' . $this->name . ' doesnt have a processor');
-    // $this->_push();
+    $this->_push();
   }
 }

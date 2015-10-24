@@ -1,7 +1,8 @@
 <?php
 
-namespace Liquid\Nodes;
+namespace Liquid\Nodes\Traits;
 
+use Liquid\Nodes\BaseNode;
 use Liquid\Messages\MessageInterface;
 use Liquid\Processors\MessengerInterface;
 use Liquid\Messages\Commands\BaseCommand;

@@ -3,6 +3,8 @@ namespace Liquid\Processors;
 
 use Liquid\Processors\BaseProcessor;
 use Liquid\Registry;
+use Liquid\Records\Collection;
+use Liquid\Records\Record;
 
 class WrappingProcessor extends BaseProcessor
 {
@@ -13,13 +15,8 @@ class WrappingProcessor extends BaseProcessor
     $this->registry = $registry;
   }
 
-  public function process(array $data, array $result_input)
-  {
-    $this->registry->initialize();
-    $this->registry->setInput($data);
-    $this->registry->setResult($result_input);
-    $this->registry->run();
-
-    $this->setOutput($this->registry->getResult());
-  }
+  public function process(Collection $collection)
+	{
+		return $record;
+	}
 }

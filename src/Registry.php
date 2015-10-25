@@ -13,8 +13,6 @@ class Registry
 
 	protected $objectPool;
 
-	protected $result = [];
-
 	public function __construct($name = null)
 	{
 		$this->name = isset($name) ? (string)$name : uniqid('reg_');
@@ -71,9 +69,9 @@ class Registry
 		}
 	}
 
-	public function process(array $data = null)
+	public function process(array $data)
 	{
-		if ($data) $this->setInput($data);
+		if ($data) $this->setInput(new Record($data));
 		foreach ($this->registries as $depth) {
 			foreach ($depth as $node) {
 				$node->process();
@@ -82,31 +80,11 @@ class Registry
 		return $this->result;
 	}
 
-	public function setInput(array $data)
+	public function setInput(Record $record)
 	{
 		$index = min(array_keys($this->registries));
 		foreach ($this->registries[$index] as $node) {
-			$node->setInput($data);
+			$node->setInput($record);
 		}
-	}
-
-	public function getOutput()
-	{
-		$index = max(array_keys($this->registries));
-		$output = [];
-		foreach ($this->registries[$index] as $node) {
-			$output = array_merge($output, $node->getOutput());
-		}
-		return $output;
-	}
-
-	public function getResult()
-	{
-		return $this->result;
-	}
-
-	public function setResult(array $result)
-	{
-		$this->result = $result;
 	}
 }

@@ -9,6 +9,8 @@ trait ProcessingTrait
 {
 	protected $processor;
 
+	protected $record;
+
   public function bind(BaseProcessor $processor)
   {
     $this->processor = $processor;
@@ -18,11 +20,9 @@ trait ProcessingTrait
 
   public function process()
   {
-    // $this->_pull();
     if ($this->status & self::STATUS_ACTIVE)
-      $this->processor->process($this->getInput(), $this->getResult());
+      $this->_push($this->processor->process($this->records));
     else
       throw new \Exception('node ' . $this->name . ' doesnt have a processor');
-    $this->_push();
   }
 }

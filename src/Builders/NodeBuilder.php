@@ -8,7 +8,7 @@ use Exception;
 
 class NodeBuilder implements BuilderInterface
 {
-  use Traits\FormatTrait;
+  use Traits\SingletonTrait, Traits\FormatTrait;
 
   protected $class;
 

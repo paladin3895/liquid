@@ -1,5 +1,5 @@
 <?php
-namespace Liquid\Builders\Traits;
+namespace Liquid\Units\Traits;
 
 use Respect\Validation\Validator;
 

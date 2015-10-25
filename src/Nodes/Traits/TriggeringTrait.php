@@ -15,14 +15,6 @@ trait TriggeringTrait
       $message->apply($this);
       $this->forwardMessage($message);
     }
-    elseif ($message instanceof Signal) {
-      $message->apply($this->processor);
-      $this->broadcastMessage($message);
-    }
-    elseif ($message instanceof Feedback) {
-      $message->apply($this);
-      $this->backwardMessage($message);
-    }
 
     $message->mark($this);
   }

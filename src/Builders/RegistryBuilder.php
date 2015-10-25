@@ -7,6 +7,7 @@ use ReflectionClass;
 
 class RegistryBuilder implements BuilderInterface
 {
+  use Traits\SingletonTrait; 
 
   protected $format = [
     'name' => 'string',

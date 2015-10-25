@@ -6,6 +6,7 @@ use Liquid\Processors\MessengerInterface;
 use Liquid\Registry;
 use Liquid\Messages\MessageInterface;
 use SplObjectStorage;
+use Liquid\Records\Collection;
 
 abstract class BaseNode
 {
@@ -22,13 +23,14 @@ abstract class BaseNode
 
 	protected $depth = 0;
 
-	protected $input = [];
-	protected $output = [];
+	protected $records;
 
 	public function __construct($name = null)
 	{
 		$this->previouses = new SplObjectStorage;
 		$this->nexts = new SplObjectStorage;
+
+		$this->records = new Collection;
 
 		$this->name = isset($name) ? (string)$name : uniqid('node_');
 		$this->status |= self::STATUS_ALIVE;
@@ -50,24 +52,9 @@ abstract class BaseNode
 		echo 'name: ' . $this->name . ', depth: ' . $this->depth . '<br/>';
 	}
 
-	public function setInput(array $data)
+	public function setInput(Record $record)
 	{
-		$this->input = $data;
+		$this->records->removeAll();
+		$this->records->attach($record);
 	}
-
-	public function getInput()
-	{
-		return $this->input;
-	}
-
-	public function setOutput(array $data)
-	{
-		$this->output = $data;
-	}
-
-	public function getOutput()
-	{
-		return $this->output;
-	}
-
 }

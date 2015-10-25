@@ -9,7 +9,7 @@ use Exception;
 
 class CommandTrigger extends BaseUnit implements FormatInterface
 {
-  use \Liquid\Builders\Traits\ValidationTrait;
+  use Traits\ValidationTrait;
 
   protected $command;
   protected $conditions;
@@ -20,9 +20,19 @@ class CommandTrigger extends BaseUnit implements FormatInterface
   {
     parent::__construct($name);
     $reflection = new ReflectionClass($this->namespace . $command);
-    if (!$reflection->isInstantiable()) throw new Exception('invalid command');
+    if (!$reflection->isInstantiable())
+      throw new Exception('invalid command in {__CLASS__} at {__FILE__}, line {__LINE__}');
     $this->command = $reflection->newInstance($receivers);
     $this->conditions = $conditions;
+  }
+
+  public function compile()
+  {
+    $conditions = $this->makeConditions($this->conditions);
+    return function (array $record, array $result) use ($conditions) {
+      if ($conditions($record)) $this->processor->trigger($this->command);
+      return $record;
+    };
   }
 
   public function process(array $record)

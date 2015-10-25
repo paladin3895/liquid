@@ -8,6 +8,8 @@ use Exception;
 
 class UnitBuilder implements BuilderInterface
 {
+  use Traits\SingletonTrait;
+
   protected $format = [
     'class' => 'string',
   ];
@@ -36,13 +38,16 @@ class UnitBuilder implements BuilderInterface
     $config = $this->_format($config);
 
     $class = new ReflectionClass($this->namespace . $config['class']);
+
     if (!$class->implementsInterface(ProcessUnitInterface::class))
       throw new Exception("invalid unit class provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
+
     if (!$class->isInstantiable())
       throw new Exception("uninstantiable unit class provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
 
     $unit = $class->newInstanceArgs($config['arguments'] ? : []);
-    return $unit;
+    $closure = $unit->compile();
+    return $closure;
   }
 
   protected function _format(array $config)

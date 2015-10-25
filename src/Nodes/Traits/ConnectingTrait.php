@@ -26,19 +26,10 @@ trait ConnectingTrait
     }
   }
 
-  protected function _push()
+  protected function _push(Record $record)
   {
     foreach ($this->nexts as $node) {
-      $node->input[$this->name] = $this->output;
-    }
-  }
-
-  protected function _pull()
-  {
-    // if ($this->previouses->count() == 0) $this->input['void'] = ['placeholder'];
-    foreach ($this->previouses as $node) {
-      if (empty($node->output)) continue;
-      $this->input[$node->name] = $node->output;
+      $node->records->attach(clone $this->record);
     }
   }
 }

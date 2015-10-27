@@ -44,10 +44,42 @@ class CommandTrigger extends BaseUnit implements FormatInterface
 
   public static function getFormat()
   {
+
+  }
+}
+
+
+namespace Liquid\Units;
+
+use Liquid\Records\Record;
+
+class Messenger implements ProcessUnitInterface
+{
+  public static function getFormat()
+  {
     return [
-      'conditions' => 'array',
-      'receivers' => 'array',
-      'command' => 'string',
+      'conditions' => ["key" => "conditions"],
+      'receivers' => ["name"],
+      'command' => 'command class',
     ];
+  }
+
+  public static function compile(array $conditions, array $receivers, $message)
+  {
+    $conditions = Validator::make($conditions);
+
+    $message = Message::make($message);
+
+    $reflection = new ReflectionClass($this->namespace . $command);
+    if (!$reflection->isInstantiable())
+      throw new Exception('invalid command in {__CLASS__} at {__FILE__}, line {__LINE__}');
+    $command = $reflection->newInstance($receivers);
+
+    return function (Record $record) use ($conditions, $message) {
+      if ($conditions($record->data)) {
+        $message->broadcast();
+      }
+      return $record;
+    };
   }
 }

@@ -6,5 +6,13 @@ use Liquid\Processors\BaseProcessor;
 
 interface ProcessUnitInterface
 {
-	public function compile();
+	/**
+	 * @return array
+	 */
+	public static function getFormat();
+
+	/**
+	 * @return closure 
+	 */
+	public static function compile();
 }

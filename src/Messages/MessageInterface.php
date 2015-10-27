@@ -6,9 +6,7 @@ use Liquid\Nodes\BaseNode;
 
 interface MessageInterface
 {
-  public function mark(BaseNode $node);
-
-  public function isMarked(BaseNode $node);
-
   public function apply($target);
+
+  public function broadcast();
 }

@@ -4,7 +4,7 @@ namespace Liquid\Records\Collection;
 
 use Liquid\Records\Record;
 use IteratorAggregate;
-use SplObjectStorage;
+use SplDoublyLinkedList;
 
 class Collection implements IteratorAggregate
 {
@@ -12,17 +12,12 @@ class Collection implements IteratorAggregate
 
   public function __construct()
   {
-    $this->container = new SplObjectStorage;
+    $this->container = new SplDoublyLinkedList;
   }
 
-  public function attach(Record $record)
+  public function __call($method , array $arguments)
   {
-    $this->container->attach($record);
-  }
-
-  public function detach(Record $record)
-  {
-    $this->container->detach($record);
+    return call_user_func_array([$this->container, $method], $arguments);
   }
 
   public function getIterator()

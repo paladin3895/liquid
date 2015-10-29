@@ -8,7 +8,10 @@ class Record
 {
   public static $result = [];
 
-  public static function reset();
+  public static function reset()
+  {
+    
+  }
 
   public $label;
 

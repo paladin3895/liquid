@@ -43,6 +43,7 @@ class ProcessorBuilder implements BuilderInterface
       $closure = UnitBuilder::getBuilder()->make($unitConfig);
       $processor->chain($closure);
     }
+    
     return $processor;
   }
 }

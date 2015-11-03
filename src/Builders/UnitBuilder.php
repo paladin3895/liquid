@@ -14,11 +14,11 @@ class UnitBuilder implements BuilderInterface
     'class' => 'string',
   ];
 
-  protected $namespace = 'Liquid\Units\\';
+  protected $namespace = 'Liquid\Processors\Units\\';
 
   public static function getFormats()
   {
-    $units_path = dirname(__DIR__) . "/Units/*.php";
+    $units_path = dirname(__DIR__) . "/Processors/Units/*.php";
     foreach (glob($units_path) as $filename)
     {
       include_once $filename;
@@ -26,7 +26,7 @@ class UnitBuilder implements BuilderInterface
 
     $formats = [];
     foreach (get_declared_classes() as $class) {
-      if (!preg_match('#^Liquid\\\Units\\\(\w+)#', $class, $matches)) continue;
+      if (!preg_match('#^Liquid\\\Processors\\\Units\\\(\w+)#', $class, $matches)) continue;
       if (!is_callable([$class, 'getFormat'])) continue;
       $formats[$matches[1]] = $class::getFormat();
     }
@@ -42,11 +42,10 @@ class UnitBuilder implements BuilderInterface
     if (!$class->implementsInterface(ProcessUnitInterface::class))
       throw new Exception("invalid unit class provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
 
-    if (!$class->isInstantiable())
-      throw new Exception("uninstantiable unit class provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
+    if (!$class->getMethod('validate')->invoke(null, $config))
+      throw new Exception("invalid config passed to unit builder {__CLASS__} at {__FILE__}, line {__LINE__}");
 
-    $unit = $class->newInstanceArgs($config['arguments'] ? : []);
-    $closure = $unit->compile();
+    $closure = $class->getMethod('compile')->invoke(null, $config['arguments'] ? : []);
     return $closure;
   }
 

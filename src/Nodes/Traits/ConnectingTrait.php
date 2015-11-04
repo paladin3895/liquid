@@ -3,6 +3,7 @@
 namespace Liquid\Nodes\Traits;
 
 use Liquid\Nodes\BaseNode;
+use Liquid\Records\Record;
 
 trait ConnectingTrait
 {
@@ -29,7 +30,7 @@ trait ConnectingTrait
   protected function _push(Record $record)
   {
     foreach ($this->nexts as $node) {
-      $node->records->attach(clone $this->record);
+      $node->collection->push(clone $this->record);
     }
   }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Liquid\Records\Collection;
+namespace Liquid\Records;
 
 use Liquid\Records\Record;
 use IteratorAggregate;

@@ -1,13 +1,11 @@
 <?php
 
-namespace Liquid\Records\Record;
+namespace Liquid\Records;
 
 use Liquid\Nodes\BaseNode;
 
 class Record
 {
-  public static $result = [];
-
   public $label;
 
   public $data = [];

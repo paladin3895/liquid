@@ -9,7 +9,7 @@ trait ProcessingTrait
 {
 	protected $processor;
 
-	protected $record;
+	protected $collection;
 
   public function bind(BaseProcessor $processor)
   {
@@ -21,7 +21,7 @@ trait ProcessingTrait
   public function process()
   {
     if ($this->status & self::STATUS_ACTIVE)
-      $this->_push($this->processor->process($this->records));
+      $this->_push($this->processor->process($this->collection));
     else
       throw new \Exception('node ' . $this->name . ' doesnt have a processor');
   }

@@ -12,6 +12,11 @@ class MergingProcessor extends BaseProcessor
 
 	public function process(Collection $collection)
 	{
+		$record = $collection->merge();
+		foreach ($this->processUnits as $unit) {
+			$closure = $unit->compile()->bindTo($this);
+			$record = $closure($record);
+		}
 		return $record;
 	}
 }

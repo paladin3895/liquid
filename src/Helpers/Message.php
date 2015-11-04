@@ -1,7 +1,7 @@
 <?php
 namespace Liquid\Helpers;
 
-class Messenger
+class Message
 {
   public function make()
   {

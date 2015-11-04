@@ -23,9 +23,9 @@ class Schema
 
 	public function __construct()
 	{
-		$this->nodeBuilder = new NodeBuilder;
-		$this->registryBuilder = new RegistryBuilder;
-		$this->processorBuilder = new ProcessorBuilder;
+		$this->nodeBuilder = NodeBuilder::getInstance();
+		$this->registryBuilder = RegistryBuilder::getInstance();
+		$this->processorBuilder = ProcessorBuilder::getInstance();
 	}
 
   public function build(array $config)

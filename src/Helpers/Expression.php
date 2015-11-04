@@ -1,13 +1,13 @@
 <?php
 namespace Liquid\Helpers;
 
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage as Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
-class Computator
+class Expression
 {
   public static function make(array $computations)
   {
-    $computator = new Expression;
+    $computator = new ExpressionLanguage;
 
     return function (array $record, array $result) use ($computations, $computator) {
 
@@ -27,4 +27,5 @@ class Computator
       }
       return $result;
     };
+  }
 }

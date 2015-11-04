@@ -1,8 +1,8 @@
 <?php
 namespace Liquid\Processors\Units;
 
-use Liquid\Helpers\Validator;
-use Liquid\Helpers\Computator;
+use Liquid\Helpers\Condition;
+use Liquid\Helpers\Expression;
 use Liquid\Records\Record;
 
 class ResultComputator implements ProcessUnitInterface
@@ -26,13 +26,20 @@ class ResultComputator implements ProcessUnitInterface
     return true;
   }
 
-  public static function compile(array $config)
+  public function __construct(array $conditions, array $computations)
   {
-    $conditions = Validator::make($config['conditions']);
-    $computations = Computator::make($config['computations']);
+    $this->conditions = Condition::make($conditions);
+    $this->computations = Expression::make($computations);
+  }
+
+  public function compile()
+  {
+    $conditions = $this->conditions;
+    $computations = $this->computations;
     return function (Record $record) use ($conditions, $computations) {
-      if ($conditions($record->data))
+      if ($conditions($record->data)) {
         $record->result = $computations($record->data, $record->result);
+      }
       return $record;
     };
   }

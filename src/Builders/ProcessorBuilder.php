@@ -40,10 +40,10 @@ class ProcessorBuilder implements BuilderInterface
     foreach ($config['units'] as $unitConfig) {
       if (!isset($unitConfig['class'])) continue;
 
-      $closure = UnitBuilder::getBuilder()->make($unitConfig);
-      $processor->chain($closure);
+      $unit = UnitBuilder::getInstance()->make($unitConfig);
+      $processor->chain($unit);
     }
-    
+
     return $processor;
   }
 }

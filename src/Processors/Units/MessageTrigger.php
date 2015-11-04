@@ -2,6 +2,8 @@
 namespace Liquid\Processors\Units;
 
 use Liquid\Records\Record;
+use Liquid\Helpers\Condition;
+use Liquid\Helpers\Message;
 
 class MessageTrigger implements ProcessUnitInterface
 {
@@ -28,9 +30,9 @@ class MessageTrigger implements ProcessUnitInterface
     return true;
   }
 
-  public static function compile(array $config)
+  public function compile()
   {
-    $conditions = Validator::make($config['conditions']);
+    $conditions = Condition::make($config['conditions']);
 
     $message = Message::make($config['message'], $config['receivers']);
 

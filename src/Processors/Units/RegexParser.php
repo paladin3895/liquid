@@ -24,12 +24,20 @@ class RegexParser implements ProcessUnitInterface
     return true;
   }
 
-  public static function compile(array $config)
+  public function __construct($key, $signature)
   {
-    return function (Record $record) use ($config) {
-      foreach ($record->data as $key => &$value) {
-        if ($key != $config['key']) continue;
-        if (preg_match($config['signature'], $value, $matches)) {
+    $this->key = $key;
+    $this->signature = $signature;
+  }
+
+  public function compile()
+  {
+    $key = $this->key;
+    $signature = $this->signature;
+    return function (Record $record) use ($key, $signature) {
+      foreach ($record->data as $label => &$value) {
+        if ($label != $key) continue;
+        if (preg_match($signature, $value, $matches)) {
           $value = end($matches);
         }
       }

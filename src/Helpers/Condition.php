@@ -4,7 +4,7 @@ namespace Liquid\Helpers;
 
 use Respect\Validation\Validator;
 
-class Validator
+class Condition
 {
   public static function make(array $conditions)
   {

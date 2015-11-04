@@ -8,12 +8,12 @@ trait SingletonTrait
 
   private function __construct()
   {
-    
+
   }
 
   public static function getInstance()
   {
-    if ($instance) return $instance;
-    self::$instance = new self();
+    if (!self::$instance) self::$instance = new self();
+    return self::$instance;
   }
 }

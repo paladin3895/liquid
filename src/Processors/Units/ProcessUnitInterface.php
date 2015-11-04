@@ -17,8 +17,7 @@ interface ProcessUnitInterface
 	public static function validate(array $config);
 
 	/**
-	 * @param array $config
 	 * @return closure
 	 */
-	public static function compile(array $config);
+	public function compile();
 }

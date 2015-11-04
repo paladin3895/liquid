@@ -2,7 +2,7 @@
 namespace Liquid\Builders;
 
 use Liquid\Builders\BuilderInterface;
-use Liquid\Units\ProcessUnitInterface;
+use Liquid\Processors\Units\ProcessUnitInterface;
 use ReflectionClass;
 use Exception;
 
@@ -28,7 +28,9 @@ class UnitBuilder implements BuilderInterface
     foreach (get_declared_classes() as $class) {
       if (!preg_match('#^Liquid\\\Processors\\\Units\\\(\w+)#', $class, $matches)) continue;
       if (!is_callable([$class, 'getFormat'])) continue;
-      $formats[$matches[1]] = $class::getFormat();
+      $format = $class::getFormat();
+      $format['class'] = $matches[1];
+      $formats[$matches[1]] = $format;
     }
     return $formats;
   }
@@ -42,11 +44,11 @@ class UnitBuilder implements BuilderInterface
     if (!$class->implementsInterface(ProcessUnitInterface::class))
       throw new Exception("invalid unit class provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
 
-    if (!$class->getMethod('validate')->invoke(null, $config))
+    if (!$class->getMethod('validate')->invoke(null, $config['arguments']))
       throw new Exception("invalid config passed to unit builder {__CLASS__} at {__FILE__}, line {__LINE__}");
 
-    $closure = $class->getMethod('compile')->invoke(null, $config['arguments'] ? : []);
-    return $closure;
+    $unit = $class->newInstanceArgs($config['arguments'] ? : []);
+    return $unit;
   }
 
   protected function _format(array $config)
@@ -65,9 +67,6 @@ class UnitBuilder implements BuilderInterface
     foreach ($this->format['arguments'] as $key => $type) {
       if (!array_key_exists($key, $config))
         throw new Exception("invalid config field {$key} provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
-
-      if (gettype($config[$key]) != $type)
-        throw new Exception("invalid data type provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
 
       $output['arguments'][$key] = $config[$key];
     }

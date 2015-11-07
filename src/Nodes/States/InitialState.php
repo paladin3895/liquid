@@ -18,7 +18,7 @@ class InitialState implements StateInterface
   {
     return function (Record $record) {
       foreach ($this->nexts as $node) {
-        $node->collection->push($record);
+        $node->collection->push(clone $record);
       }
     };
   }

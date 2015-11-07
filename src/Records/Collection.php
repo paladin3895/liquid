@@ -28,6 +28,7 @@ class Collection implements IteratorAggregate
   public function merge()
   {
     $data = [];
+    $result = [];
     foreach ($this->container as $record) {
       $data = array_merge($data, $record->data);
       $result = array_merge($result, $record->result);

@@ -30,7 +30,8 @@ class Collection implements IteratorAggregate
     $data = [];
     foreach ($this->container as $record) {
       $data = array_merge($data, $record->data);
+      $result = array_merge($result, $record->result);
     }
-    return new Record($data);
+    return new Record($data, $result);
   }
 }

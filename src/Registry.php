@@ -75,7 +75,6 @@ class Registry
 				$node->process();
 			}
 		}
-		return $this->result;
 	}
 
 	public function setInput(Record $record)

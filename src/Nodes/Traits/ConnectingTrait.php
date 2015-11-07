@@ -26,11 +26,4 @@ trait ConnectingTrait
       $next->_update();
     }
   }
-
-  protected function _push(Record $record)
-  {
-    foreach ($this->nexts as $node) {
-      $node->collection->push(clone $this->record);
-    }
-  }
 }

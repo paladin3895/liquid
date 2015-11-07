@@ -12,6 +12,7 @@ abstract class BaseProcessor
 {
 	protected $name;
 	protected $processUnits;
+	protected $algorithms;
 	protected $node;
 
 	public function __construct($name = null)
@@ -47,16 +48,8 @@ abstract class BaseProcessor
 
 	public function trigger(MessageInterface $message)
 	{
-		$this->node->handleMessage($message);
+		$this->node->handle($message);
 	}
 
-	/*
-	 * $input into the processor with format
-	 * ['node_name' => ['key' => 'scalar value', ...], ...]
-	 * after process the output format ['key' => 'scalar value', ...]
-	 * which will be encapsulated into
-	 * ['node_name' => ['key' => 'scalar value', ...], ...]
-	 * at the next node to keep data format consistent
-	 */
 	abstract public function process(Collection $collection);
 }

@@ -14,10 +14,11 @@ class Record
 
   protected $history = [];
 
-  public function __construct(array $data)
+  public function __construct(array $data = null, array $result = null)
   {
     $this->label = 'record_' . uniqid();
-    $this->data = $data;
+    $this->data = $data ? : [];
+    $this->result = $result ? : [];
   }
 
   public function __clone()

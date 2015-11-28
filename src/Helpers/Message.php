@@ -3,11 +3,18 @@ namespace Liquid\Helpers;
 
 class Message
 {
-  public function make()
+  public static $namespace = 'Liquid\\\Messages';
+
+  public static function make($message)
   {
-    $reflection = new ReflectionClass($this->namespace . $command);
+    if (preg_match('#Command$#', $message)) {
+      $this->namespace .= '\\\Commands';
+    }
+
+    $reflection = new ReflectionClass($this->namespace . '\\' . $message);
     if (!$reflection->isInstantiable())
       throw new Exception('invalid command in {__CLASS__} at {__FILE__}, line {__LINE__}');
-    $command = $reflection->newInstance($receivers);
+    $message = $reflection->newInstance($receivers);
+    return $message;
   }
 }

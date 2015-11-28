@@ -9,18 +9,12 @@ class InitialState implements StateInterface
 {
   public function compileProcess()
   {
-    return function (Collection $collection) {
-      return $this->processor->process($collection);
-    };
+    return function () {};
   }
 
   public function compilePush()
   {
-    return function (Record $record) {
-      foreach ($this->nexts as $node) {
-        $node->collection->push(clone $record);
-      }
-    };
+    return function () {};
   }
 
   public function compileHandle()

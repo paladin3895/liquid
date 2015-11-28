@@ -2,11 +2,11 @@
 namespace Liquid\Builders;
 
 use Liquid\Builders\BuilderInterface;
-use Liquid\Processors\Units\ProcessUnitInterface;
+use Liquid\Processors\Algorithms\AlgorithmInterface;
 use ReflectionClass;
 use Exception;
 
-class UnitBuilder implements BuilderInterface
+class AlgorithmBuilder implements BuilderInterface
 {
   use Traits\SingletonTrait;
 
@@ -14,18 +14,18 @@ class UnitBuilder implements BuilderInterface
     'class' => 'string',
   ];
 
-  protected $namespace = 'Liquid\Processors\Units\\';
+  protected $namespace = 'Liquid\Processors\Algorithms\\';
 
   public static function getFormats()
   {
-    $units_path = dirname(__DIR__) . "/Processors/Units/*.php";
+    $units_path = dirname(__DIR__) . "/Processors/Algorithms/*.php";
     foreach (glob($units_path) as $filename) {
       include_once $filename;
     }
 
     $formats = [];
     foreach (get_declared_classes() as $class) {
-      if (!preg_match('#^Liquid\\\Processors\\\Units\\\(\w+)#', $class, $matches)) continue;
+      if (!preg_match('#^Liquid\\\Processors\\\Algorithms\\\(\w+)#', $class, $matches)) continue;
       if (!is_callable([$class, 'getFormat'])) continue;
       $format = $class::getFormat();
       $format['class'] = $matches[1];
@@ -40,11 +40,11 @@ class UnitBuilder implements BuilderInterface
 
     $class = new ReflectionClass($this->namespace . $config['class']);
 
-    if (!$class->implementsInterface(ProcessUnitInterface::class))
-      throw new Exception("invalid unit class provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
+    if (!$class->implementsInterface(AlgorithmInterface::class))
+      throw new Exception("invalid algorithm class provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
 
     if (!$class->getMethod('validate')->invoke(null, $config['arguments']))
-      throw new Exception("invalid config passed to unit builder {__CLASS__} at {__FILE__}, line {__LINE__}");
+      throw new Exception("invalid config passed to algorithm builder {__CLASS__} at {__FILE__}, line {__LINE__}");
 
     $unit = $class->newInstanceArgs($config['arguments'] ? : []);
     return $unit;

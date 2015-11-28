@@ -2,8 +2,8 @@
 
 namespace Liquid\Processors;
 
-use SplObjectStorage;
 use Closure;
+use Liquid\Processors\Units\UnitStack;
 use Liquid\Processors\Units\ProcessUnitInterface;
 use Liquid\Nodes\BaseNode;
 use Liquid\Records\Collection;
@@ -12,19 +12,19 @@ abstract class BaseProcessor
 {
 	protected $name;
 	protected $processUnits;
-	protected $algorithms;
+	protected $algorithm;
 	protected $node;
 
 	public function __construct($name = null)
 	{
 		$this->name = isset($name) ? (string)$name : uniqid('proc_');
-		$this->processUnits = new SplObjectStorage;
+		$this->processUnits = new UnitStack;
 	}
 
-	// public function chain(Closure $closure)
-	// {
-	// 	$this->processUnits[] = $closure->bindTo($this, static::class);
-	// }
+	public function learn(AlgorithmInterface $algorithm)
+	{
+		$this->algorithm = $algorithm;
+	}
 
 	public function chain(ProcessUnitInterface $unit)
 	{
@@ -51,5 +51,11 @@ abstract class BaseProcessor
 		$this->node->handle($message);
 	}
 
-	abstract public function process(Collection $collection);
+	public function process(Collection $collection)
+	{
+		return call_user_func(
+			$this->algorithm->compile($this->processUnits)->bindTo($this),
+			$collection
+		);
+	}
 }

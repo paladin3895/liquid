@@ -3,8 +3,9 @@ namespace Liquid\Builders;
 
 use Liquid\Builders\BuilderInterface;
 use Liquid\Builders\UnitBuilder;
+use Liquid\Builders\AlgorithmBuilder;
 
-use Liquid\Processors\BaseProcessor;
+use Liquid\Processors\Processor;
 use ReflectionClass;
 use Exception;
 
@@ -13,34 +14,39 @@ class ProcessorBuilder implements BuilderInterface
   use Traits\SingletonTrait, Traits\FormatTrait;
 
   protected $unitBuilder;
-  protected $closureBuilder;
+  protected $algorithmBuilder;
 
   protected $namespace = 'Liquid\Processors\\';
 
   protected $format = [
-    'class' => 'string',
     'name' => 'string',
+    'algorithm' => 'array',
     'units' => 'array',
   ];
 
+  public function initialize(
+    AlgorithmBuilder $algorithmBuilder,
+    UnitBuilder $unitBuilder
+  ) {
+    $this->algorithmBuilder = $algorithmBuilder;
+    $this->unitBuilder = $unitBuilder;
+  }
+
   public function make(array $config)
   {
+    if (!isset($this->unitBuilder) || !isset($this->algorithmBuilder))
+      throw new Exception("algorithm builder or unit builder not provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
+
     $config = $this->_format($config);
 
-    $class = new ReflectionClass($this->namespace . $config['class']);
+    $processor = new Processor($config['name']);
 
-    if (!$class->isSubclassOf(BaseProcessor::class))
-        throw new Exception("invalid node class in {__CLASS__} at {__FILE__}, line {__LINE__}");
-
-    if (!$class->isInstantiable())
-        throw new Exception("uninstantiable class provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
-
-    $processor = $class->newInstance($config['name']);
+    $algorithm = $this->algorithmBuilder->make($config['algorithm']);
+    $processor->learn($algorithm);
 
     foreach ($config['units'] as $unitConfig) {
       if (!isset($unitConfig['class'])) continue;
-
-      $unit = UnitBuilder::getInstance()->make($unitConfig);
+      $unit = $this->unitBuilder->make($unitConfig);
       $processor->chain($unit);
     }
 

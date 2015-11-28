@@ -21,11 +21,14 @@ class Schema
   protected $registryBuilder;
   protected $processorBuilder;
 
-	public function __construct()
-	{
-		$this->nodeBuilder = NodeBuilder::getInstance();
-		$this->registryBuilder = RegistryBuilder::getInstance();
-		$this->processorBuilder = ProcessorBuilder::getInstance();
+	public function __construct(
+		RegistryBuilder $registryBuilder,
+		NodeBuilder $nodeBuilder,
+		ProcessorBuilder $processorBuilder
+	) {
+		$this->nodeBuilder = $nodeBuilder;
+		$this->registryBuilder = $registryBuilder;
+		$this->processorBuilder = $processorBuilder;
 	}
 
   public function build(array $config)

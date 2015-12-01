@@ -1,7 +1,7 @@
 <?php
 namespace Liquid\Processors\Units;
 
-use Liquid\Processors\ProcessUnitInterface;
+use Liquid\Processors\Units\ProcessUnitInterface;
 use SplObjectStorage;
 
 class UnitStack extends SplObjectStorage

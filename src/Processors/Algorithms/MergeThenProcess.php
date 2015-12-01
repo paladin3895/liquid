@@ -10,13 +10,18 @@ class MergeThenProcess implements AlgorithmInterface
 
 	public static function getFormat()
   {
-
+		return [];
   }
 
 	public static function validate(array $config)
   {
-
+		return true;
   }
+
+	public function __construct()
+	{
+
+	}
 
 	public function compile(UnitStack $units)
   {

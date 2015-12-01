@@ -25,10 +25,10 @@ class NodeBuilder implements BuilderInterface
 
     $class = new ReflectionClass($this->namespace);
     if (!$class->isSubclassOf('Liquid\Nodes\BaseNode'))
-      throw new Exception("invalid node class provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
+      throw new Exception("invalid node class provided");
 
     if (!$class->isInstantiable())
-      throw new Exception("uninstantiable node class provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
+      throw new Exception("uninstantiable node class provided");
 
     return $class->newInstance($config['name']);
   }

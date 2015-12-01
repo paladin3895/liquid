@@ -41,10 +41,10 @@ class UnitBuilder implements BuilderInterface
     $class = new ReflectionClass($this->namespace . $config['class']);
 
     if (!$class->implementsInterface(ProcessUnitInterface::class))
-      throw new Exception("invalid unit class provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
+      throw new Exception("invalid unit class provided");
 
     if (!$class->getMethod('validate')->invoke(null, $config['arguments']))
-      throw new Exception("invalid config passed to unit builder {__CLASS__} at {__FILE__}, line {__LINE__}");
+      throw new Exception("invalid config passed to unit builder");
 
     $unit = $class->newInstanceArgs($config['arguments'] ? : []);
     return $unit;
@@ -53,10 +53,10 @@ class UnitBuilder implements BuilderInterface
   protected function _format(array $config)
   {
     if (!isset($config['class']))
-      throw new Exception("invalid class provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
+      throw new Exception("invalid class provided");
 
     if (!is_callable([$this->namespace . $config['class'], 'getFormat']))
-      throw new Exception("unit class {$config['class']} does not provide format in {__CLASS__} at {__FILE__}, line {__LINE__}");
+      throw new Exception("unit class {$config['class']} does not provide format");
 
     $this->format['arguments'] = call_user_func(
       [$this->namespace . $config['class'], 'getFormat']
@@ -65,7 +65,7 @@ class UnitBuilder implements BuilderInterface
     $output['class'] = $config['class'];
     foreach ($this->format['arguments'] as $key => $type) {
       if (!array_key_exists($key, $config))
-        throw new Exception("invalid config field {$key} provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
+        throw new Exception("invalid config field {$key} provided");
 
       $output['arguments'][$key] = $config[$key];
     }

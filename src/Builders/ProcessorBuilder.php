@@ -35,7 +35,7 @@ class ProcessorBuilder implements BuilderInterface
   public function make(array $config)
   {
     if (!isset($this->unitBuilder) || !isset($this->algorithmBuilder))
-      throw new Exception("algorithm builder or unit builder not provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
+      throw new Exception("algorithm builder or unit builder not provided");
 
     $config = $this->_format($config);
 

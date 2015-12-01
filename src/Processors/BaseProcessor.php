@@ -2,24 +2,33 @@
 
 namespace Liquid\Processors;
 
-use SplObjectStorage;
-use Liquid\Units\ProcessUnitInterface;
+use Closure;
+use Liquid\Processors\Units\UnitStack;
+use Liquid\Processors\Units\ProcessUnitInterface;
 use Liquid\Nodes\BaseNode;
+use Liquid\Records\Collection;
 
 abstract class BaseProcessor
 {
 	protected $name;
-	protected $processUnits = [];
+	protected $processUnits;
+	protected $algorithm;
 	protected $node;
 
 	public function __construct($name = null)
 	{
 		$this->name = isset($name) ? (string)$name : uniqid('proc_');
+		$this->processUnits = new UnitStack;
 	}
 
-	public function chain(callable $closure)
+	public function learn(AlgorithmInterface $algorithm)
 	{
-		$this->processUnits[] = $closure;
+		$this->algorithm = $algorithm;
+	}
+
+	public function chain(ProcessUnitInterface $unit)
+	{
+		$this->processUnits->attach($unit);
 	}
 
 	public function bind(BaseNode $node)
@@ -37,13 +46,16 @@ abstract class BaseProcessor
 		return $this->name;
 	}
 
-	/*
-	 * $input into the processor with format
-	 * ['node_name' => ['key' => 'scalar value', ...], ...]
-	 * after process the output format ['key' => 'scalar value', ...]
-	 * which will be encapsulated into
-	 * ['node_name' => ['key' => 'scalar value', ...], ...]
-	 * at the next node to keep data format consistent
-	 */
-	abstract public function process(Collection $collection);
+	public function trigger(MessageInterface $message)
+	{
+		$this->node->handle($message);
+	}
+
+	public function process(Collection $collection)
+	{
+		return call_user_func(
+			$this->algorithm->compile($this->processUnits)->bindTo($this),
+			$collection
+		);
+	}
 }

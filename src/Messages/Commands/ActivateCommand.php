@@ -3,13 +3,14 @@
 namespace Liquid\Messages\Commands;
 
 use Liquid\Nodes\BaseNode;
+use Liquid\Nodes\States\ActiveState;
 
-class TerminateCommand extends BaseCommand
+class ActivateCommand extends BaseCommand
 {
   public function apply($target)
   {
     if (!($target instanceof BaseNode)) return;
     if (!in_array($target->getName(), $this->receivers)) return;
-    $target->terminate();
+    $target->change(new ActiveState);
   }
 }

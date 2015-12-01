@@ -1,16 +1,20 @@
 <?php
 namespace Liquid\Nodes;
 
-use Liquid\Processors\Processor;
-use Liquid\Processors\MessengerInterface;
+use Liquid\Nodes\States\InitialState;
+use Liquid\Processors\BaseProcessor;
 use Liquid\Registry;
-use Liquid\Messages\MessageInterface;
-use SplObjectStorage;
+
 use Liquid\Records\Collection;
+use Liquid\Records\Record;
+use Liquid\Messages\MessageInterface;
+use Liquid\Nodes\States\StateInterface;
+
+use SplObjectStorage;
 
 abstract class BaseNode
 {
-	use Traits\RegisteringTrait, Traits\ConnectingTrait, Traits\ProcessingTrait, Traits\TriggeringTrait;
+	use Traits\RegisteringTrait, Traits\ConnectingTrait;
 
 	const STATUS_ALIVE				= 0b001;
 	const STATUS_ACTIVE				= 0b010;
@@ -18,19 +22,23 @@ abstract class BaseNode
 
 	protected $name;
 	protected $status;
-	protected $previouses;
-	protected $nexts;
+
+	public $previouses;
+	public $nexts;
 
 	protected $depth = 0;
 
-	protected $records;
+	protected $state;
+	public $collection;
 
 	public function __construct($name = null)
 	{
+		$this->state = new InitialState;
+
 		$this->previouses = new SplObjectStorage;
 		$this->nexts = new SplObjectStorage;
 
-		$this->records = new Collection;
+		$this->collection = new Collection;
 
 		$this->name = isset($name) ? (string)$name : uniqid('node_');
 		$this->status |= self::STATUS_ALIVE;
@@ -54,7 +62,34 @@ abstract class BaseNode
 
 	public function setInput(Record $record)
 	{
-		$this->records->removeAll();
-		$this->records->attach($record);
+		$this->collection->push($record);
+	}
+
+	public function bind(BaseProcessor $processor)
+	{
+		$this->processor = $processor;
+		$processor->bind($this);
+		$this->status |= self::STATUS_ACTIVE;
+	}
+
+	public function process()
+	{
+		if ($this->status & self::STATUS_ACTIVE) {
+			$record = call_user_func($this->state->compileProcess()->bindTo($this), $this->collection);
+			call_user_func($this->state->compilePush()->bindTo($this), $record);
+		} else {
+			throw new \Exception('node ' . $this->name . ' doesnt have a processor');
+		}
+	}
+
+	public function handle(MessageInterface $message)
+	{
+		call_user_func($this->state->compileHandle()->bindTo($this), $message);
+		call_user_func($this->state->compileBroadcast()->bindTo($this), $message);
+	}
+
+	public function change(StateInterface $state)
+	{
+		$this->state = $state;
 	}
 }

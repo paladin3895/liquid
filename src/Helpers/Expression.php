@@ -1,14 +1,13 @@
 <?php
-namespace Liquid\Units\Traits;
+namespace Liquid\Helpers;
 
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage as Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
-trait ExpressionTrait
+class Expression
 {
-  public function makeComputations(array $computations)
+  public static function make(array $computations)
   {
-
-    $computator = new Expression;
+    $computator = new ExpressionLanguage;
 
     return function (array $record, array $result) use ($computations, $computator) {
 

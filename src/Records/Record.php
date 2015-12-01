@@ -1,15 +1,11 @@
 <?php
 
-namespace Liquid\Records\Record;
+namespace Liquid\Records;
 
 use Liquid\Nodes\BaseNode;
 
 class Record
 {
-  public static $result = [];
-
-  public static function reset();
-
   public $label;
 
   public $data = [];
@@ -18,10 +14,11 @@ class Record
 
   protected $history = [];
 
-  public function __construct(array $data)
+  public function __construct(array $data = null, array $result = null)
   {
     $this->label = 'record_' . uniqid();
-    $this->data = $data;
+    $this->data = $data ? : [];
+    $this->result = $result ? : [];
   }
 
   public function __clone()

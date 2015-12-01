@@ -6,11 +6,14 @@ trait SingletonTrait
 {
   protected static $instance;
 
-  private function __construct();
+  private function __construct()
+  {
+
+  }
 
   public static function getInstance()
   {
-    if ($instance) return $instance;
-    self::$instance = new self();
+    if (!self::$instance) self::$instance = new self();
+    return self::$instance;
   }
 }

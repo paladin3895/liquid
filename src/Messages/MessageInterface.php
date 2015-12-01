@@ -7,6 +7,4 @@ use Liquid\Nodes\BaseNode;
 interface MessageInterface
 {
   public function apply($target);
-
-  public function broadcast();
 }

@@ -9,10 +9,10 @@ trait FormatTrait
     $output = [];
     foreach ($this->format as $key => $type) {
       if (!array_key_exists($key, $config))
-          throw new Exception("invalid config field {$key} in {__CLASS__} at {__FILE__}, line {__LINE__}");
+          throw new Exception("invalid config field {$key}");
 
       if (gettype($config[$key]) != $type)
-          throw new Exception("invalid data type of config field {$key} provided in {__CLASS__} at {__FILE__}, line {__LINE__}");
+          throw new Exception("invalid data type of config field {$key} provided");
 
       $output[$key] = $config[$key];
 

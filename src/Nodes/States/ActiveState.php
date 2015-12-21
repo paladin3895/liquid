@@ -21,4 +21,20 @@ class ActiveState extends InitialState
       }
     };
   }
+
+  public function compileHandle()
+  {
+    return function (MessageInterface $message) {
+      $message->apply($this);
+    };
+  }
+
+  public function compileBroadcast()
+  {
+    return function (MessageInterface $message) {
+      foreach ($this->nexts as $node) {
+        $node->handle($message);
+      }
+    };
+  }
 }

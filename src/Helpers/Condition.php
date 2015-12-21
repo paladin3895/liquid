@@ -12,7 +12,7 @@ class Condition
     foreach ($conditions as $key => $evaluations) {
       $closures[] = self::makeEvaluations($key, $evaluations);
     }
-    return function(array $record) use ($closures) {
+    return function (array $record) use ($closures) {
       foreach ($closures as $closure) {
         if (!$closure($record)) return false;
       }

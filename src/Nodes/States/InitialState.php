@@ -9,12 +9,16 @@ class InitialState implements StateInterface
 {
   public function compileProcess()
   {
-    return function () {};
+    return function () {
+      // do nothing
+    };
   }
 
   public function compilePush()
   {
-    return function () {};
+    return function () {
+      // do nothing
+    };
   }
 
   public function compileHandle()

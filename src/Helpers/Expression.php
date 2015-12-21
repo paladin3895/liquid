@@ -28,4 +28,11 @@ class Expression
       return $result;
     };
   }
+
+  public static function makeExpression($expression)
+  {
+    return function (array $record) use ($expression) {
+      return (new ExpressionLanguage)->evaluate($expression, $record);
+    }
+  }
 }

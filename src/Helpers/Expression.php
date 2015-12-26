@@ -33,6 +33,6 @@ class Expression
   {
     return function (array $record) use ($expression) {
       return (new ExpressionLanguage)->evaluate($expression, $record);
-    }
+    };
   }
 }

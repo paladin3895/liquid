@@ -4,7 +4,7 @@ namespace Liquid\Processors\Units\Rewards;
 use Liquid\Helpers\Expression;
 use Liquid\Records\Record;
 
-class AddPointReward implements BaseReward
+class AddPointReward extends BaseReward
 {
   protected $attribute;
   protected $computation;
@@ -17,7 +17,6 @@ class AddPointReward implements BaseReward
     return [
       'attribute' => 'name',
       'point' => 0,
-      'class' => 'AddPointReward'
     ];
   }
 
@@ -55,6 +54,6 @@ class AddPointReward implements BaseReward
         throw new \Exception('invalid attribute data type');
       $record->data[$attribute] = $computation($record->data);
       return $record;
-    }
+    };
   }
 }

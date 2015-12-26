@@ -4,7 +4,7 @@ namespace Liquid\Processors\Units\Policies;
 use Liquid\Helpers\Condition;
 use Liquid\Records\Record;
 
-class CheckValuePolicy implements BasePolicy
+class CheckValuePolicy extends BasePolicy
 {
   protected $condition;
 
@@ -16,7 +16,6 @@ class CheckValuePolicy implements BasePolicy
     return [
       'attribute' => 'name',
       'condition' => 'condition',
-      'class' => 'CheckValuePolicy',
     ];
   }
 
@@ -49,6 +48,6 @@ class CheckValuePolicy implements BasePolicy
     return function (Record $record) use ($condition) {
       if ($condition($record->data)) return true;
       else return false;
-    }
+    };
   }
 }

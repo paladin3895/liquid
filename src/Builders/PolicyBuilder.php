@@ -14,7 +14,7 @@ class PolicyBuilder implements BuilderInterface
   use Traits\FormatTrait;
 
   protected $format = [
-    'name' => 'string',
+    'id' => 'integer',
     'policy' => 'array',
     'reward' => 'array',
   ];
@@ -23,7 +23,7 @@ class PolicyBuilder implements BuilderInterface
   {
     $config = $this->_format($config);
 
-    $processor = new PolicyProcessor($config['name']);
+    $processor = new PolicyProcessor($config['id']);
 
     foreach ($config['policy'] as $policy) {
       $policy = $this->_makePolicy($policy);
@@ -31,17 +31,17 @@ class PolicyBuilder implements BuilderInterface
     }
 
     foreach ($config['reward'] as $reward) {
-      $reward = $this->_makePolicy($reward);
+      $reward = $this->_makeReward($reward);
       $processor->registerReward($reward);
     }
 
     return $processor;
   }
 
-  public function getPolicyFormats()
+  public static function getPolicyFormats()
   {
-    $policies_path = dirname(__DIR__) . "/Processors/Units/Policies/*.php";
-    foreach (glob($units_path) as $filename) {
+    $policy_path = dirname(__DIR__) . "/Processors/Units/Policies/*.php";
+    foreach (glob($policy_path) as $filename) {
       include_once $filename;
     }
 
@@ -50,32 +50,57 @@ class PolicyBuilder implements BuilderInterface
       if (!preg_match('#^Liquid\\\Processors\\\Units\\\Policies\\\(\w+)#', $class, $matches)) continue;
       if (!is_callable([$class, 'getFormat'])) continue;
       $format = $class::getFormat();
-      $format['class'] = $matches[1];
+      $format['class'] = $class;
       $formats[$matches[1]] = $format;
     }
     return $formats;
   }
 
-  public function getRewardFormats()
+  public static function getRewardFormats()
   {
+    $reward_path = dirname(__DIR__) . "/Processors/Units/Rewards/*.php";
+    foreach (glob($reward_path) as $filename) {
+      include_once $filename;
+    }
 
+    $formats = [];
+    foreach (get_declared_classes() as $class) {
+      if (!preg_match('#^Liquid\\\Processors\\\Units\\\Rewards\\\(\w+)#', $class, $matches)) continue;
+      if (!is_callable([$class, 'getFormat'])) continue;
+      $format = $class::getFormat();
+      $format['class'] = $class;
+      $formats[$matches[1]] = $format;
+    }
+    return $formats;
   }
 
   protected function _makePolicy(array $config)
   {
     if (!isset($config['class'])) throw new \Exception('policy with no class name');
     $reflection = new ReflectionClass($config['class']);
-    if (!$reflection->isInstantiable() || !$reflection->isSubclassOf(BasePolicy::class))
+    if ($reflection->isSubclassOf(BasePolicy::class) && $reflection->isSubclassOf(BasePolicy::class)) {
+      return $reflection->newInstanceArgs($this->_formatConfig($config, $config['class']::getFormat()));
+    } else {
       throw new \Exception('policy class is not valid');
-    return $reflection->newInstanceArgs($config);
+    }
   }
 
   protected function _makeReward(array $config)
   {
     if (!isset($config['class'])) throw new \Exception('reward with no class name');
     $reflection = new ReflectionClass($config['class']);
-    if (!$reflection->isInstantiable() || !$reflection->isSubclassOf(BaseReward::class))
+    if ($reflection->isInstantiable() || $reflection->isSubclassOf(BaseReward::class)) {
+      return $reflection->newInstanceArgs($this->_formatConfig($config, $config['class']::getFormat()));
+    } else {
       throw new \Exception('reward class is not valid');
-    return $reflection->newInstanceArgs($config);
+    }
+  }
+
+  protected function _formatConfig(array $config, array $format) {
+    $result = [];
+    foreach ($format as $key => $value) {
+      $result[$key] = isset($config[$key]) ? $config[$key] : $value;
+    }
+    return $result;
   }
 }

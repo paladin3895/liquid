@@ -12,9 +12,12 @@ class Registry
 
 	protected $nodes = [];
 
+	protected $objectPool;
+
 	public function __construct($name = null)
 	{
 		$this->name = isset($name) ? (string)$name : uniqid('reg_');
+		$this->objectPool = new SplObjectStorage;
 	}
 
 	public function getName()

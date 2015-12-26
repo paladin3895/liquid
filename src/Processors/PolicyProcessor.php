@@ -2,8 +2,9 @@
 namespace Liquid\Processors;
 
 use Liquid\Processors\Units\UnitStack;
-use Liquid\Processors\Units\ProcessUnitInterface;
-use Liquid\Processors\Algorithms\AlgorithmInterface;
+use Liquid\Processors\Units\Policies\BasePolicy;
+use Liquid\Processors\Units\Rewards\BaseReward;
+use Liquid\Records\Collection;
 
 class PolicyProcessor extends BaseProcessor
 {
@@ -18,12 +19,12 @@ class PolicyProcessor extends BaseProcessor
     $this->rewards = new UnitStack;
   }
 
-	public function registerPolicy(AlgorithmInterface $policy)
+	public function registerPolicy(BasePolicy $policy)
 	{
 		$this->policies->attach($policy);
 	}
 
-	public function registerReward(ProcessUnitInterface $reward)
+	public function registerReward(BaseReward $reward)
 	{
 		$this->rewards->attach($reward);
 	}

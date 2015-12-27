@@ -34,7 +34,7 @@ class PolicyProcessor extends BaseProcessor
     $record = $collection->merge();
 		foreach ($this->policies as $policy) {
       $closure = $policy->compile()->bindTo($this);
-      if (!$closure($record)) return $record;
+      if (!$closure($record)) return false;
     }
 
     foreach ($this->rewards as $reward) {

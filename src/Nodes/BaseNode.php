@@ -74,24 +74,12 @@ abstract class BaseNode
 		$this->status |= self::STATUS_ACTIVE;
 	}
 
-	public function process()
-	{
-		if ($this->status & self::STATUS_ACTIVE) {
-			$record = call_user_func($this->state->compileProcess()->bindTo($this), $this->collection);
-			call_user_func($this->state->compilePush()->bindTo($this), $record);
-		} else {
-			throw new \Exception('node ' . $this->name . ' doesnt have a processor');
-		}
-	}
-
-	public function handle(MessageInterface $message)
-	{
-		call_user_func($this->state->compileHandle()->bindTo($this), $message);
-		call_user_func($this->state->compileBroadcast()->bindTo($this), $message);
-	}
-
 	public function change(StateInterface $state)
 	{
 		$this->state = $state;
 	}
+
+	abstract public function process();
+
+	abstract public function handle(MessageInterface $message);
 }

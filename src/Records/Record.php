@@ -12,6 +12,8 @@ class Record
 
   public $result = [];
 
+  public $status = false;
+
   protected $history = [];
 
   public function __construct(array $data = null, array $result = null)

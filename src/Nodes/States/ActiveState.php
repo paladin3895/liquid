@@ -4,7 +4,7 @@ namespace Liquid\Nodes\States;
 use Liquid\Records\Collection;
 use Liquid\Records\Record;
 
-class ActiveState extends InitialState
+class ActiveState implements StateInterface
 {
   public function compileProcess()
   {
@@ -17,7 +17,8 @@ class ActiveState extends InitialState
   {
     return function (Record $record) {
       foreach ($this->nexts as $node) {
-        $node->collection->push($record);
+        $node->change(new self);
+        $node->setInput(clone $record);
       }
     };
   }

@@ -2,8 +2,6 @@
 namespace Liquid\Nodes;
 
 use Liquid\Nodes\States\InitialState;
-use Liquid\Nodes\States\InactiveState;
-use Liquid\Nodes\States\ActiveState;
 use Liquid\Processors\BaseProcessor;
 use Liquid\Registry;
 
@@ -35,7 +33,7 @@ abstract class BaseNode
 
 	public function __construct($name = null)
 	{
-		$this->state = new ActiveState;
+		$this->state = new InitialState;
 
 		$this->previouses = new SplObjectStorage;
 		$this->nexts = new SplObjectStorage;
@@ -65,6 +63,7 @@ abstract class BaseNode
 	public function setInput(Record $record)
 	{
 		$this->collection->push($record);
+		$record->fromHistory($this);
 	}
 
 	public function bind(BaseProcessor $processor)

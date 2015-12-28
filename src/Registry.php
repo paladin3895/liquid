@@ -3,6 +3,7 @@
 namespace Liquid;
 
 use Liquid\Nodes\BaseNode;
+use Liquid\Nodes\States\ActiveState;
 use Liquid\Records\Record;
 use SplObjectStorage;
 
@@ -49,30 +50,30 @@ class Registry
 	public function register(BaseNode $node)
 	{
 		if ($this->hasRegistered($node)) return;
-		else $this->getDepth($node->getDepth())->attach($node);
+		else $this->attach($node);
 	}
 
 	public function unregister(BaseNode $node)
 	{
 		if (!$this->hasRegistered($node)) return;
-		else $this->getDepth($node->getDepth())->detach($node);
+		else $this->detach($node);
 	}
 
 	public function hasRegistered(BaseNode $node)
 	{
-		return $this->getDepth($node->getDepth())->contains($node);
+		return $this->objectPool->contains($node);
 	}
 
 	public function initialize()
 	{
 		foreach ($this->objectPool as $node) {
-			$node->register($this);
+			$this->getDepth($node->getDepth())->attach($node);
 		}
 	}
 
-	public function process(array $data)
+	public function process(Record $record)
 	{
-		if ($data) $this->setInput(new Record($data));
+		$this->setInput($record);
 		foreach ($this->nodes as $depth) {
 			foreach ($depth as $node) {
 				$node->process();
@@ -84,7 +85,8 @@ class Registry
 	{
 		$index = min(array_keys($this->nodes));
 		foreach ($this->nodes[$index] as $node) {
-			$node->setInput($record);
+			$node->setInput(clone $record);
+			$node->change(new ActiveState);
 		}
 	}
 }

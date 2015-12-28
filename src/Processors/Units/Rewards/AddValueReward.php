@@ -4,7 +4,7 @@ namespace Liquid\Processors\Units\Rewards;
 use Liquid\Helpers\Expression;
 use Liquid\Records\Record;
 
-class AddPointReward extends BaseReward
+class AddValueReward extends BaseReward
 {
   protected $attribute;
   protected $computation;
@@ -16,7 +16,7 @@ class AddPointReward extends BaseReward
   {
     return [
       'attribute' => 'name',
-      'point' => 0,
+      'value' => 'expression',
     ];
   }
 
@@ -29,16 +29,16 @@ class AddPointReward extends BaseReward
     if (!isset($config['attribute'])) return false;
     if (!is_scalar($config['attribute'])) return false;
 
-    if (!isset($config['point'])) return false;
-    if (!is_numeric($config['point'])) return false;
+    if (!isset($config['value'])) return false;
+    if (!is_scalar($config['value'])) return false;
 
     return true;
   }
 
-  public function __construct($attribute, $point)
+  public function __construct($attribute, $value)
   {
     $this->attribute = $attribute;
-    $this->computation = Expression::makeExpression("{$attribute} + {$point}");
+    $this->computation = Expression::makeExpression($value);
   }
 
 	/**
@@ -52,7 +52,9 @@ class AddPointReward extends BaseReward
       if (!isset($record->data[$attribute])) $record->data[$attribute] = 0;
       if (!is_numeric($record->data[$attribute]))
         throw new \Exception('invalid attribute data type');
+      $old_value = $record->data[$attribute];
       $record->data[$attribute] = $computation($record->data);
+      $record->result[$attribute] = $record->data[$attribute] - $old_value;
       return $record;
     };
   }

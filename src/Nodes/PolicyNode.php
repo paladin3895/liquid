@@ -3,6 +3,7 @@ namespace Liquid\Nodes;
 
 use Liquid\Nodes\BaseNode;
 use Liquid\Nodes\States\PassiveState;
+use Liquid\Messages\MessageInterface;
 
 class PolicyNode extends BaseNode
 {
@@ -10,12 +11,9 @@ class PolicyNode extends BaseNode
 	{
 		if ($this->status & self::STATUS_ACTIVE) {
 			$record = call_user_func($this->state->compileProcess()->bindTo($this), $this->collection);
-      if ($record->status) {
-		    call_user_func($this->state->compilePush()->bindTo($this), $record);
-      } else {
-        foreach ($this->nexts as $node) {
-          $node->change(new PassiveState);
-        }
+      if ($record) {
+        $record->toHistory($this);
+        if ($record->status) call_user_func($this->state->compilePush()->bindTo($this), $record);
       }
 		} else {
 			throw new \Exception('node ' . $this->name . ' doesnt have a processor');

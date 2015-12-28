@@ -32,16 +32,19 @@ class PolicyProcessor extends BaseProcessor
 	public function process(Collection $collection)
 	{
     $record = $collection->merge();
+    $record->fromHistory($this->node);
 		foreach ($this->policies as $policy) {
       $closure = $policy->compile()->bindTo($this);
-      if (!$closure($record)) return false;
+      if (!$closure($record)) {
+        $record->status = false;
+        return $record;
+      }
     }
-
     foreach ($this->rewards as $reward) {
       $closure = $reward->compile()->bindTo($this);
       $record = $closure($record);
     }
-
+    $record->status = true;
     return $record;
 	}
 }

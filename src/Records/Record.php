@@ -6,30 +6,49 @@ use Liquid\Nodes\BaseNode;
 
 class Record
 {
+  public static $history = [];
+
   public $label;
+
+  public $status = false;
 
   public $data = [];
 
   public $result = [];
 
-  public $status = false;
+  public $memory = [];
 
-  protected $history = [];
-
-  public function __construct(array $data = null, array $result = null)
+  public function __construct(array $data = [], array $history = [])
   {
     $this->label = 'record_' . uniqid();
-    $this->data = $data ? : [];
-    $this->result = $result ? : [];
+    $this->data = $data;
+    self::$history += $history;
   }
 
   public function __clone()
   {
     $this->label = 'record_' . uniqid();
+    $this->status = false;
+    $this->result = [];
+    $this->memory = [];
+  }
+
+  public function fromHistory(BaseNode $node)
+  {
+    if (isset(self::$history[$node->getName()])) {
+      $checkpoint = self::$history[$node->getName()];
+      $this->status = $checkpoint['status'];
+      $this->memory = $checkpoint['memory'];
+      $this->result = $checkpoint['result'];
+    }
   }
 
   public function toHistory(BaseNode $node)
   {
-    $this->history[$this->label] = $node->getName();
+    self::$history[$node->getName()] = [
+        'status' => (int) $this->status,
+        'memory' => $this->memory,
+        'result' => $this->result,
+    ];
   }
 }

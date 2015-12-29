@@ -39,7 +39,6 @@ class Record
       $checkpoint = self::$history[$node->getName()];
       $this->status = $checkpoint['status'];
       $this->memory = $checkpoint['memory'];
-      $this->result = $checkpoint['result'];
     }
   }
 

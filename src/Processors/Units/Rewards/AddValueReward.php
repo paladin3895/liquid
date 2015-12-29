@@ -50,8 +50,6 @@ class AddValueReward extends BaseReward
     $computation = $this->computation;
     return function (Record $record) use ($attribute, $computation) {
       if (!isset($record->data[$attribute])) $record->data[$attribute] = 0;
-      if (!is_numeric($record->data[$attribute]))
-        throw new \Exception('invalid attribute data type');
       $old_value = $record->data[$attribute];
       $record->data[$attribute] = $computation($record->data);
       $record->result[$attribute] = $record->data[$attribute] - $old_value;

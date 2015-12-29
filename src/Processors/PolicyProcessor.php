@@ -33,6 +33,7 @@ class PolicyProcessor extends BaseProcessor
 	{
     $record = $collection->merge();
     $record->fromHistory($this->node);
+    if ($record->status) return $record;
 		foreach ($this->policies as $policy) {
       $closure = $policy->compile()->bindTo($this);
       if (!$closure($record)) {

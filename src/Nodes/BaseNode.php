@@ -54,12 +54,6 @@ abstract class BaseNode
 		return $this->name;
 	}
 
-	public function display()
-	{
-		echo '########## Node ##########<br/>';
-		echo 'name: ' . $this->name . ', depth: ' . $this->depth . '<br/>';
-	}
-
 	public function setInput(Record $record)
 	{
 		$this->collection->push($record);

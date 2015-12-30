@@ -20,26 +20,17 @@ trait RegisteringTrait
     }
   }
 
-  public function initialize(Registry $registry)
-  {
-    $this->register($registry);
-    foreach ($this->nexts as $node) {
-      $node->initialize($registry);
-    }
-  }
-
   public function register(Registry $registry)
   {
     $this->registry = $registry;
-    if ($this->registry->hasRegistered($this)) return;
-    $this->registry->register($this);
+    $this->registry->attach($this);
     $this->status |= self::STATUS_INITIALIZED;
   }
 
   public function unregister()
   {
-    if (!$this->registry->hasRegistered($this)) return;
-    $this->registry->unregister($this);
+    $this->registry->detach($this);
+		$this->registry = null;
     $this->status &= ~self::STATUS_INITIALIZED;
   }
 

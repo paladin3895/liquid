@@ -47,23 +47,6 @@ class Registry
 			$this->objectPool->detach($node);
 	}
 
-	public function register(BaseNode $node)
-	{
-		if ($this->hasRegistered($node)) return;
-		else $this->attach($node);
-	}
-
-	public function unregister(BaseNode $node)
-	{
-		if (!$this->hasRegistered($node)) return;
-		else $this->detach($node);
-	}
-
-	public function hasRegistered(BaseNode $node)
-	{
-		return $this->objectPool->contains($node);
-	}
-
 	public function initialize()
 	{
 		foreach ($this->objectPool as $node) {

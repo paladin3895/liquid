@@ -45,7 +45,7 @@ class Record
   public function toHistory(BaseNode $node)
   {
     self::$history[$node->getName()] = [
-        'status' => (int) $this->status,
+        'status' => (bool)$this->status,
         'memory' => $this->memory,
         'result' => $this->result,
     ];

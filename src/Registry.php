@@ -66,6 +66,7 @@ class Registry
 
 	public function setInput(Record $record)
 	{
+		if (empty($this->nodes)) return;
 		$index = min(array_keys($this->nodes));
 		foreach ($this->nodes[$index] as $node) {
 			$node->setInput(clone $record);

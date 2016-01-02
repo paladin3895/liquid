@@ -51,8 +51,8 @@ class AddValueReward extends BaseReward
     return function (Record $record) use ($attribute, $computation) {
       if (!isset($record->data[$attribute])) $record->data[$attribute] = 0;
       $old_value = $record->data[$attribute];
-      $record->data[$attribute] = $computation($record->data);
-      $record->result[$attribute] = $record->data[$attribute] - $old_value;
+      $new_value = $computation($record->data);
+      $record->result[$attribute] = $new_value - $old_value;
       return $record;
     };
   }

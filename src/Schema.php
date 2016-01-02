@@ -1,11 +1,9 @@
 <?php
 namespace Liquid;
 
-use Liquid\Builders\NodeBuilder;
-use Liquid\Builders\RegistryBuilder;
-use Liquid\Builders\ProcessorBuilder;
-use Liquid\Builders\UnitBuilder;
-use Liquid\Builders\ClosureBuilder;
+use Liquid\Registry;
+use Liquid\Nodes\BaseNode;
+use Liquid\Builders\BuilderInterface;
 
 use PDO;
 use ReflectionClass;
@@ -13,63 +11,60 @@ use Liquid\Schema;
 
 class Schema
 {
-	protected $objectPool = [];
+  protected $node;
+  protected $registry;
+  protected $builder;
 
-	protected $objectGroup = [];
+	public function __construct(array $config = []) {
+		$regRef = new ReflectionClass($config['registry']);
+		if ($regRef->isInstantiable() && $regRef->isSubclassOf('Liquid\Registry')) {
+			$this->registry = $regRef;
+		} else {
+			throw new \Exception('invalid registry class in config');
+		}
 
-  protected $nodeBuilder;
-  protected $registryBuilder;
-  protected $processorBuilder;
+		$nodeRef = new ReflectionClass($config['node']);
+		if ($nodeRef->isInstantiable() && $nodeRef->isSubclassOf('Liquid\Nodes\BaseNode')) {
+			$this->node = $nodeRef;
+		} else {
+			throw new \Exception('invalid node class in config');
+		}
 
-	public function __construct(
-		RegistryBuilder $registryBuilder,
-		NodeBuilder $nodeBuilder,
-		ProcessorBuilder $processorBuilder
-	) {
-		$this->nodeBuilder = $nodeBuilder;
-		$this->registryBuilder = $registryBuilder;
-		$this->processorBuilder = $processorBuilder;
+		$builderRef = new ReflectionClass($config['builder']);
+		if ($builderRef->isInstantiable() && $builderRef->implementsInterface('Liquid\Builders\BuilderInterface')) {
+			$this->builder = $builderRef->newInstance();
+		}
 	}
 
-  public function build(array $config)
+  public function build(array $config_nodes, array $config_links)
   {
-		// $config = $schema->getConfig();
-		$this->objectPool['registry'] = $this->registryBuilder->make($config);
+		$registry = $this->registry->newInstance();
 
-		$nodes_config = json_decode($config['nodes'], true);
-		if (!empty($nodes_config)) $this->_buildNodes($nodes_config);
+		$nodes = $this->_buildNodes($config_nodes, $registry);
+		$this->_buildLinks($config_links, $nodes);
 
-		$links_config = json_decode($config['links']);
-		if (!empty($links_config)) $this->_buildLinks($links_config);
-
-		$this->_initialize();
-		return $this->objectPool['registry'];
+		$registry->initialize();
+		return $registry;
   }
 
-	protected function _buildNodes(array $nodes_config)
+	protected function _buildNodes(array $config_nodes, Registry $registry)
 	{
-		foreach ($nodes_config as $node_config) {
-			$node = $this->nodeBuilder->make($node_config);
-			$processor = $this->processorBuilder->make($node_config);
-			$node->bind($processor);
-			$this->objectPool['nodes'][$node_config['key']] = $node;
+		$nodes = [];
+		foreach ($config_nodes as $node) {
+				$policy = $this->builder->make($node);
+				$nodes[$node['id']] = $this->node->newInstance($node['id']);
+				$nodes[$node['id']]->bind($policy);
+				$nodes[$node['id']]->register($registry);
 		}
+		return $nodes;
 	}
 
-	protected function _buildLinks(array $links_config)
+	protected function _buildLinks(array $config_links, array $nodes)
 	{
-		foreach ($links_config as $link) {
-			$from = $this->objectPool['nodes'][$link->from];
-			$to = $this->objectPool['nodes'][$link->to];
-			$from->forward($to);
-		}
-	}
-
-	protected function _initialize()
-	{
-		if (empty($this->objectPool['nodes'])) return;
-		foreach ($this->objectPool['nodes'] as $node) {
-			$node->register($this->objectPool['registry']);
+		foreach ($config_links as $link) {
+				if (isset($nodes[$link['node_from']]) && isset($nodes[$link['node_to']])) {
+						$nodes[$link['node_from']]->forward($nodes[$link['node_to']]);
+				}
 		}
 	}
 }

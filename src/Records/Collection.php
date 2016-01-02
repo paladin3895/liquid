@@ -8,6 +8,8 @@ use SplDoublyLinkedList;
 
 class Collection implements IteratorAggregate
 {
+  use Traits\MergeTrait;
+
   protected $container;
 
   public function __construct()
@@ -31,7 +33,10 @@ class Collection implements IteratorAggregate
     $result = [];
     foreach ($this->container as $record) {
       $data = array_merge($data, $record->data);
-      $result = array_merge($result, $record->result);
+      $result = $this->_conditionedMerge($result, $record->result);
+    }
+    foreach ($result as $key => $value) {
+      $data = $this->_conditionedMerge($data, $result);
     }
     return new Record($data, $result);
   }

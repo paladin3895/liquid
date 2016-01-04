@@ -29,7 +29,6 @@ class Record
   {
     $this->label = 'record_' . uniqid();
     $this->status = false;
-    $this->result = [];
     $this->memory = [];
   }
 

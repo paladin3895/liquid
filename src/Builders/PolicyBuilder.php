@@ -15,8 +15,8 @@ class PolicyBuilder implements BuilderInterface
 
   protected $format = [
     'id' => 'integer',
-    'policy' => 'array',
-    'reward' => 'array',
+    'policies' => 'array',
+    'rewards' => 'array',
   ];
 
   public function make(array $config)
@@ -24,13 +24,12 @@ class PolicyBuilder implements BuilderInterface
     $config = $this->_format($config);
 
     $processor = new PolicyProcessor($config['id']);
-
-    foreach ($config['policy'] as $policy) {
+    foreach ($config['policies'] as $policy) {
       $policy = $this->_makePolicy($policy);
       $processor->registerPolicy($policy);
     }
 
-    foreach ($config['reward'] as $reward) {
+    foreach ($config['rewards'] as $reward) {
       $reward = $this->_makeReward($reward);
       $processor->registerReward($reward);
     }

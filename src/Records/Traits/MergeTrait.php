@@ -1,5 +1,5 @@
 <?php
-namespace Liquid\Records;
+namespace Liquid\Records\Traits;
 
 trait MergeTrait
 {

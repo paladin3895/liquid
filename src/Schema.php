@@ -17,7 +17,9 @@ class Schema
 
 	public function __construct(array $config = []) {
 		$regRef = new ReflectionClass($config['registry']);
-		if ($regRef->isInstantiable() && $regRef->isSubclassOf('Liquid\Registry')) {
+		if ($regRef->isInstantiable()
+      && ($regRef->isSubclassOf('Liquid\Registry') || $config['registry'] == 'Liquid\Registry')
+    ) {
 			$this->registry = $regRef;
 		} else {
 			throw new \Exception('invalid registry class in config');

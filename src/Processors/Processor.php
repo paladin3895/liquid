@@ -4,6 +4,7 @@ namespace Liquid\Processors;
 use Liquid\Processors\Units\UnitStack;
 use Liquid\Processors\Units\ProcessUnitInterface;
 use Liquid\Processors\Algorithms\AlgorithmInterface;
+use Liquid\Records\Collection;
 
 class Processor extends BaseProcessor
 {

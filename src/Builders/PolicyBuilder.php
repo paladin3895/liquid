@@ -1,15 +1,14 @@
 <?php
 namespace Liquid\Builders;
 
-use Liquid\Builders\BuilderInterface;
-
-use Liquid\Processors\PolicyProcessor;
+use Liquid\Processors\BaseProcessor;
 use Liquid\Processors\Units\Policies\BasePolicy;
 use Liquid\Processors\Units\Rewards\BaseReward;
+use Liquid\Interfaces\ConfigurableInterface;
 use ReflectionClass;
 use Exception;
 
-class PolicyBuilder implements BuilderInterface
+class PolicyBuilder
 {
   use Traits\FormatTrait;
 
@@ -17,13 +16,14 @@ class PolicyBuilder implements BuilderInterface
     'id' => 'integer',
     'policies' => 'array',
     'rewards' => 'array',
+    'config' => 'array',
   ];
 
   public function make(array $config)
   {
     $config = $this->_format($config);
 
-    $processor = new PolicyProcessor($config['id']);
+    $processor = $this->_makeProcessor($config['config']);
     foreach ($config['policies'] as $policy) {
       $policy = $this->_makePolicy($policy);
       $processor->registerPolicy($policy);
@@ -73,33 +73,53 @@ class PolicyBuilder implements BuilderInterface
     return $formats;
   }
 
+  public static function getProcessorFormats()
+  {
+    $processor_path = dirname(__DIR__) . "/Processors/*.php";
+    foreach (glob($processor_path) as $filename) {
+      include_once $filename;
+    }
+
+    $formats = [];
+    foreach (get_declared_classes() as $class) {
+      if (!preg_match('#^Liquid\\\Processors\\\(\w+)#', $class, $matches)) continue;
+      if (!is_callable([$class, 'getFormat'])) continue;
+      $format = $class::getFormat();
+      $format['class'] = $class;
+      $formats[$matches[1]] = $format;
+    }
+    return $formats;
+  }
+
   protected function _makePolicy(array $config)
   {
-    if (!isset($config['class'])) throw new \Exception('policy with no class name');
-    $reflection = new ReflectionClass($config['class']);
-    if ($reflection->isSubclassOf(BasePolicy::class) && $reflection->isSubclassOf(BasePolicy::class)) {
-      return $reflection->newInstanceArgs($this->_formatConfig($config, $config['class']::getFormat()));
-    } else {
-      throw new \Exception('policy class is not valid');
-    }
+    return $this->_makeComponent($config, 'policy', BasePolicy::class);
   }
 
   protected function _makeReward(array $config)
   {
-    if (!isset($config['class'])) throw new \Exception('reward with no class name');
-    $reflection = new ReflectionClass($config['class']);
-    if ($reflection->isInstantiable() || $reflection->isSubclassOf(BaseReward::class)) {
-      return $reflection->newInstanceArgs($this->_formatConfig($config, $config['class']::getFormat()));
-    } else {
-      throw new \Exception('reward class is not valid');
-    }
+    return $this->_makeComponent($config, 'reward', BaseReward::class);
   }
 
-  protected function _formatConfig(array $config, array $format) {
-    $result = [];
-    foreach ($format as $key => $value) {
-      $result[$key] = isset($config[$key]) ? $config[$key] : $value;
+  protected function _makeProcessor(array $config)
+  {
+    return $this->_makeComponent($config, 'processor', BaseProcessor::class);
+  }
+
+  protected function _makeComponent(array $config, $componentName, $baseClass)
+  {
+    if (!isset($config['class'])) throw new \Exception("{$componentName} with no class name");
+    $reflection = new ReflectionClass($config['class']);
+    if (
+      $reflection->isInstantiable() &&
+      $reflection->isSubclassOf($baseClass) &&
+      $reflection->implementsInterface(ConfigurableInterface::class)
+    ) {
+      return $reflection->newInstanceArgs(
+        $reflection->getMethod('validate')->invoke(null, $config)
+      );
+    } else {
+      throw new \Exception("{$componentName} class is not valid");
     }
-    return $result;
   }
 }

@@ -21,17 +21,24 @@ class CheckValuePolicy extends BasePolicy
 
 	/**
 	 * @param array $config
-	 * @return boolean
+	 * @return array
 	 */
 	public static function validate(array $config)
   {
-    if (!isset($config['attribute'])) return false;
-    if (!is_scalar($config['attribute'])) return false;
+    $result = [];
+    if (isset($config['attribute']) && is_scalar($config['attribute'])) {
+      $result['attribute'] = $config['attribute'];
+    } else {
+      throw new \Exception('invalid value for policy config: attribute');
+    }
 
-    if (!isset($config['condition'])) return false;
-    if (!is_scalar($config['condition'])) return false;
+    if (isset($config['condition']) && is_scalar($config['condition'])) {
+      $result['condition'] = $config['condition'];
+    } else {
+      throw new \Exception('invalid value for policy config: condition');
+    }
 
-    return true;
+    return $result;
   }
 
   public function __construct($attribute, $condition)

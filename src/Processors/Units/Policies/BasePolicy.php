@@ -1,7 +1,7 @@
 <?php
 namespace Liquid\Processors\Units\Policies;
 
-use Liquid\Processors\Units\ProcessUnitInterface;
+use Liquid\Interfaces\ProcessUnitInterface;
 
 abstract class BasePolicy implements ProcessUnitInterface
 {

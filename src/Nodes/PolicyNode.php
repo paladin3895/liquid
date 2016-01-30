@@ -3,7 +3,7 @@ namespace Liquid\Nodes;
 
 use Liquid\Nodes\BaseNode;
 use Liquid\Nodes\States\PassiveState;
-use Liquid\Messages\MessageInterface;
+use Liquid\Interfaces\MessageInterface;
 
 class PolicyNode extends BaseNode
 {

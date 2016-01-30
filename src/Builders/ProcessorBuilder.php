@@ -1,7 +1,6 @@
 <?php
 namespace Liquid\Builders;
 
-use Liquid\Builders\BuilderInterface;
 use Liquid\Builders\UnitBuilder;
 use Liquid\Builders\AlgorithmBuilder;
 
@@ -9,7 +8,7 @@ use Liquid\Processors\Processor;
 use ReflectionClass;
 use Exception;
 
-class ProcessorBuilder implements BuilderInterface
+class ProcessorBuilder
 {
   use Traits\SingletonTrait, Traits\FormatTrait;
 

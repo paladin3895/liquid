@@ -7,8 +7,8 @@ use Liquid\Registry;
 
 use Liquid\Records\Collection;
 use Liquid\Records\Record;
-use Liquid\Messages\MessageInterface;
-use Liquid\Nodes\States\StateInterface;
+use Liquid\Interfaces\MessageInterface;
+use Liquid\Interfaces\StateInterface;
 
 use SplObjectStorage;
 

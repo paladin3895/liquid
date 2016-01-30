@@ -22,18 +22,25 @@ class AddValueReward extends BaseReward
 
 	/**
 	 * @param array $config
-	 * @return boolean
+	 * @return array
 	 */
-	public static function validate(array $config)
-  {
-    if (!isset($config['attribute'])) return false;
-    if (!is_scalar($config['attribute'])) return false;
+   public static function validate(array $config)
+   {
+     $result = [];
+     if (isset($config['attribute']) && is_scalar($config['attribute'])) {
+       $result['attribute'] = $config['attribute'];
+     } else {
+       throw new \Exception('invalid value for reward config: attribute');
+     }
 
-    if (!isset($config['value'])) return false;
-    if (!is_scalar($config['value'])) return false;
+     if (isset($config['value']) && is_scalar($config['value'])) {
+       $result['value'] = $config['value'];
+     } else {
+       throw new \Exception('invalid value for reward config: value');
+     }
 
-    return true;
-  }
+     return $result;
+   }
 
   public function __construct($attribute, $value)
   {

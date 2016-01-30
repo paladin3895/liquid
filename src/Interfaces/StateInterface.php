@@ -1,5 +1,5 @@
 <?php
-namespace Liquid\Nodes\States;
+namespace Liquid\Interfaces;
 
 interface StateInterface
 {

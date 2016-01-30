@@ -5,6 +5,7 @@ namespace Liquid\Processors;
 use Closure;
 use Liquid\Nodes\BaseNode;
 use Liquid\Records\Collection;
+use Liquid\Interfaces\MessageInterface;
 
 abstract class BaseProcessor
 {

@@ -1,6 +1,7 @@
 <?php
 namespace Liquid\Processors\Units;
 
+use Liquid\Interfaces\ProcessUnitInterface;
 use Liquid\Records\Record;
 
 class RegexParser implements ProcessUnitInterface

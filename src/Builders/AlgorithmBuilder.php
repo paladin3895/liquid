@@ -1,12 +1,11 @@
 <?php
 namespace Liquid\Builders;
 
-use Liquid\Builders\BuilderInterface;
 use Liquid\Processors\Algorithms\AlgorithmInterface;
 use ReflectionClass;
 use Exception;
 
-class AlgorithmBuilder implements BuilderInterface
+class AlgorithmBuilder
 {
   use Traits\SingletonTrait;
 

@@ -1,12 +1,11 @@
 <?php
 namespace Liquid\Builders;
 
-use Liquid\Builders\BuilderInterface;
 use Liquid\Processors\Units\ProcessUnitInterface;
 use ReflectionClass;
 use Exception;
 
-class UnitBuilder implements BuilderInterface
+class UnitBuilder
 {
   use Traits\SingletonTrait;
 

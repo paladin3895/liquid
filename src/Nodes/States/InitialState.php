@@ -3,7 +3,9 @@ namespace Liquid\Nodes\States;
 
 use Liquid\Records\Collection;
 use Liquid\Records\Record;
-use Liquid\Messages\MessageInterface;
+
+use Liquid\Interfaces\MessageInterface;
+use Liquid\Interfaces\StateInterface;
 
 class InitialState implements StateInterface
 {

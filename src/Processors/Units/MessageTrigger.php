@@ -1,6 +1,7 @@
 <?php
 namespace Liquid\Processors\Units;
 
+use Liquid\Interfaces\ProcessUnitInterface;
 use Liquid\Records\Record;
 use Liquid\Helpers\Condition;
 use Liquid\Helpers\Message;

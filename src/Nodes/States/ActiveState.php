@@ -4,6 +4,9 @@ namespace Liquid\Nodes\States;
 use Liquid\Records\Collection;
 use Liquid\Records\Record;
 
+use Liquid\Interfaces\MessageInterface;
+use Liquid\Interfaces\StateInterface;
+
 class ActiveState implements StateInterface
 {
   public function compileProcess()

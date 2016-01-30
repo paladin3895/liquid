@@ -8,29 +8,39 @@ use Liquid\Processors\Units\Policies\BasePolicy;
 use Liquid\Processors\Units\Rewards\BaseReward;
 use Liquid\Records\Collection;
 
-class PolicyProcessor extends BaseProcessor implements ConfigurableInterface
+class CycleProcessor extends BaseProcessor implements ConfigurableInterface
 {
   protected $policies;
 
 	protected $rewards;
 
+  protected $number;
+
   public static function getFormat()
   {
     return [
-      'class' => 'Liquid\Processors\PolicyProcessor',
+      'class' => 'Liquid\Processors\CycleProcessor',
+      'number' => 0
     ];
   }
 
   public static function validate(array $config)
   {
-    return [];
+    $result = [];
+    if (isset($config['number']) && is_int($config['number'])) {
+      $result['number'] = $config['number'];
+    } else {
+      throw new \Exception('invalid processor config: number');
+    }
+    return $result;
   }
 
-  public function __construct($name = null)
+  public function __construct($number, $name = null)
   {
     parent::__construct($name);
 		$this->policies = new UnitStack;
     $this->rewards = new UnitStack;
+    $this->number = $number;
   }
 
 	public function registerPolicy(BasePolicy $policy)
@@ -47,19 +57,21 @@ class PolicyProcessor extends BaseProcessor implements ConfigurableInterface
 	{
     $record = $collection->merge();
     $record->fromHistory($this->node);
-    if ($record->status) return $record;
+
+    if ($record->status >= $this->number) return $record;
+
 		foreach ($this->policies as $policy) {
       $closure = $policy->compile()->bindTo($this);
       if (!$closure($record)) {
-        $record->status = false;
         return $record;
       }
     }
+
     foreach ($this->rewards as $reward) {
       $closure = $reward->compile()->bindTo($this);
       $record = $closure($record);
     }
-    $record->status = true;
+    $record->status++;
     return $record;
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 namespace Liquid\Processors\Algorithms;
 
-use Liquid\Processors\Algorithms\AlgorithmInterface;
+use Liquid\Interfaces\AlgorithmInterface;
 use Liquid\Processors\Units\UnitStack;
 use Liquid\Records\Collection;
 

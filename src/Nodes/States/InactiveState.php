@@ -1,7 +1,11 @@
 <?php
 namespace Liquid\Nodes\States;
 
-use Liquid\Messages\MessageInterface;
+use Liquid\Records\Collection;
+use Liquid\Records\Record;
+
+use Liquid\Interfaces\MessageInterface;
+use Liquid\Interfaces\StateInterface;
 
 class InactiveState implements StateInterface
 {

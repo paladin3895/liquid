@@ -27,8 +27,8 @@ class CycleProcessor extends BaseProcessor implements ConfigurableInterface
   public static function validate(array $config)
   {
     $result = [];
-    if (isset($config['number']) && is_int($config['number'])) {
-      $result['number'] = $config['number'];
+    if (isset($config['number']) && is_scalar($config['number'])) {
+      $result['number'] = (int)$config['number'];
     } else {
       throw new \Exception('invalid processor config: number');
     }
@@ -57,8 +57,9 @@ class CycleProcessor extends BaseProcessor implements ConfigurableInterface
 	{
     $record = $collection->merge();
     $record->fromHistory($this->node);
-
-    if ($record->status >= $this->number) return $record;
+    if (!isset($record->status)) $record->status = 0;
+    if ($this->number > 0 && $record->status >= $this->number)
+      return $record;
 
 		foreach ($this->policies as $policy) {
       $closure = $policy->compile()->bindTo($this);

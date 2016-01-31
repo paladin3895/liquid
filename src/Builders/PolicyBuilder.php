@@ -16,14 +16,14 @@ class PolicyBuilder
     'id' => 'integer',
     'policies' => 'array',
     'rewards' => 'array',
-    'config' => 'array',
+    'config' => 'object',
   ];
 
   public function make(array $config)
   {
     $config = $this->_format($config);
 
-    $processor = $this->_makeProcessor($config['config']);
+    $processor = $this->_makeProcessor((array)$config['config']);
     foreach ($config['policies'] as $policy) {
       $policy = $this->_makePolicy($policy);
       $processor->registerPolicy($policy);

@@ -47,11 +47,11 @@ class PolicyProcessor extends BaseProcessor implements ConfigurableInterface
 	{
     $record = $collection->merge();
     $record->fromHistory($this->node);
+    if (!isset($record->status)) $record->status = false;
     if ($record->status) return $record;
 		foreach ($this->policies as $policy) {
       $closure = $policy->compile()->bindTo($this);
       if (!$closure($record)) {
-        $record->status = false;
         return $record;
       }
     }

@@ -22,13 +22,14 @@ class Record
   {
     $this->label = 'record_' . uniqid();
     $this->data = $data;
+    $this->status = false;
     self::$history += $history;
   }
 
   public function __clone()
   {
     $this->label = 'record_' . uniqid();
-    $this->status = null;
+    $this->status = false;
     $this->memory = [];
   }
 
@@ -36,7 +37,7 @@ class Record
   {
     if (isset(self::$history[$node->getName()])) {
       $checkpoint = self::$history[$node->getName()];
-      $this->status = isset($checkpoint['status']) ? $checkpoint['status'] : null;
+      $this->status = isset($checkpoint['status']) ? $checkpoint['status'] : false;
       $this->memory = isset($checkpoint['memory']) ? $checkpoint['memory'] : [];
     }
   }
@@ -44,7 +45,7 @@ class Record
   public function toHistory(BaseNode $node)
   {
     self::$history[$node->getName()] = [
-        'status' => $this->status,
+        'status' => (bool)$this->status,
         'memory' => $this->memory,
         'result' => $this->result,
     ];

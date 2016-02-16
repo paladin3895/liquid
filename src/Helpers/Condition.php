@@ -22,14 +22,14 @@ class Condition
 
   public static function makeEvaluations($key, $evaluations)
   {
-    $evaluations = explode(',', $evaluations);
+    $evaluations = explode('|', $evaluations);
     $validator = new Validator;
     foreach ($evaluations as $evaluation) {
       $evaluation = explode(':', $evaluation);
       $type = $evaluation[0];
       $operands = [];
       if (isset($evaluation[1])) {
-        $operands = explode('|', $evaluation[1]);
+        $operands = explode(',', $evaluation[1]);
       }
       $validator = call_user_func_array([$validator, $type], $operands);
     }

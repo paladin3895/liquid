@@ -53,8 +53,7 @@ class CheckValuePolicy extends BasePolicy
   {
     $condition = $this->condition;
     return function (Record $record) use ($condition) {
-      if ($condition($record->data)) return true;
-      else return false;
+      return $condition($record->data);
     };
   }
 }

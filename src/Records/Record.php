@@ -6,7 +6,12 @@ use Liquid\Nodes\BaseNode;
 
 class Record
 {
-  public static $history = [];
+  use Traits\MergeTrait;
+
+  public static $history = [
+    'result' => [],
+    'checkpoint' => [],
+  ];
 
   public $label;
 
@@ -18,12 +23,11 @@ class Record
 
   public $memory = [];
 
-  public function __construct(array $data = [], array $history = [])
+  public function __construct(array $data = [], array $result = [])
   {
     $this->label = 'record_' . uniqid();
     $this->data = $data;
     $this->status = false;
-    self::$history += $history;
   }
 
   public function __clone()
@@ -36,7 +40,7 @@ class Record
   public function fromHistory(BaseNode $node)
   {
     if (isset(self::$history[$node->getName()])) {
-      $checkpoint = self::$history[$node->getName()];
+      $checkpoint = self::$history['checkpoint'][$node->getName()];
       $this->status = isset($checkpoint['status']) ? $checkpoint['status'] : false;
       $this->memory = isset($checkpoint['memory']) ? $checkpoint['memory'] : [];
     }
@@ -44,10 +48,11 @@ class Record
 
   public function toHistory(BaseNode $node)
   {
-    self::$history[$node->getName()] = [
+    self::$history['checkpoint'][$node->getName()] = [
         'status' => (bool)$this->status,
         'memory' => $this->memory,
         'result' => $this->result,
     ];
+    self::$history['result'] = $this->_conditionedMerge(self::$history['result'], $this->result);
   }
 }

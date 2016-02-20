@@ -56,6 +56,7 @@ class Registry
 
 	public function process(Record $record)
 	{
+		ksort($this->nodes);
 		$this->setInput($record);
 		foreach ($this->nodes as $depth) {
 			foreach ($depth as $node) {

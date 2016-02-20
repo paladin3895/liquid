@@ -35,9 +35,9 @@ class Collection implements IteratorAggregate
       $data = array_merge($data, $record->data);
       $result = $this->_conditionedMerge($result, $record->result);
     }
-    foreach ($result as $key => $value) {
-      $data = $this->_conditionedMerge($data, $result);
-    }
+
+    $data = $this->_conditionedMerge($data, $result);
+
     return new Record($data, $result);
   }
 }

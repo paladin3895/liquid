@@ -8,39 +8,109 @@ class Record
 {
   use Traits\MergeTrait;
 
-  public static $history = [
+  protected static $history = [
     'result' => [],
     'checkpoint' => [],
   ];
 
-  public $label;
+  protected $label;
 
-  public $status;
+  protected $status;
 
-  public $data = [];
+  protected $data = [];
 
-  public $result = [];
+  protected $result = [];
 
-  public $memory = [];
+  protected $memory = [];
 
-  public function __construct(array $data = [], array $result = [])
+  public function __construct(array $data = [], array $result = [], array $memory = [])
   {
     $this->label = 'record_' . uniqid();
     $this->data = $data;
+    $this->result = $result;
+    $this->memory = $memory;
     $this->status = false;
+  }
+
+  public static function history($index = null)
+  {
+    if ($index) {
+      if (array_key_exists($index, self::$history)) {
+        return self::$history[$index];
+      } else {
+        throw new \Exception("field {$index} not exists in record history");
+      }
+    } else {
+      return self::$history;
+    }
+  }
+
+  public static function forget()
+  {
+    self::$history = [
+      'result' => [],
+      'checkpoint' => [],
+    ];
   }
 
   public function __clone()
   {
     $this->label = 'record_' . uniqid();
+    // reset status and memory
     $this->status = false;
     $this->memory = [];
   }
 
+  public function getLabel()
+  {
+    return (string)$this->label;
+  }
+
+  public function getData()
+  {
+    return (array)$this->data;
+  }
+
+  public function getResult()
+  {
+    return (array)$this->result;
+  }
+
+  public function setResult(array $value)
+  {
+    $this->result = $value;
+  }
+
+  public function getHistory()
+  {
+    return self::$history;
+  }
+
+  public function getMemory()
+  {
+    return (array)$this->memory;
+  }
+
+  public function setMemory(array $value)
+  {
+    $this->memory = $value;
+  }
+
+  public function getStatus()
+  {
+    return (boolean)$this->status;
+  }
+
+  public function setStatus($value)
+  {
+    $this->status = (boolean)$value;
+  }
+
   public function fromHistory(BaseNode $node)
   {
-    if (isset(self::$history[$node->getName()])) {
+    if (isset(self::$history['checkpoint'][$node->getName()])) {
       $checkpoint = self::$history['checkpoint'][$node->getName()];
+      // load status and memory from history checkpoint
       $this->status = isset($checkpoint['status']) ? $checkpoint['status'] : false;
       $this->memory = isset($checkpoint['memory']) ? $checkpoint['memory'] : [];
     }

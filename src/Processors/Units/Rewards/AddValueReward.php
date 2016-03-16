@@ -56,10 +56,11 @@ class AddValueReward extends BaseReward
     $attribute = $this->attribute;
     $computation = $this->computation;
     return function (Record $record) use ($attribute, $computation) {
-      if (!isset($record->data[$attribute])) $record->data[$attribute] = 0;
-      $old_value = $record->data[$attribute];
-      $new_value = $computation($record->data);
-      $record->result[$attribute] = $new_value - $old_value;
+      $data = array_merge($record->getResult(), $record->getData());
+      if (!isset($data[$attribute])) $data[$attribute] = 0;
+      $old_value = $data[$attribute];
+      $new_value = $computation($data);
+      $record->setResult($attribute, $new_value - $old_value);
       return $record;
     };
   }

@@ -32,11 +32,11 @@ class Collection implements IteratorAggregate
     $data = [];
     $result = [];
     foreach ($this->container as $record) {
-      $data = array_merge($data, $record->data);
-      $result = $this->_conditionedMerge($result, $record->result);
+      $data = $record->getData();
+      $result = $this->_conditionedMerge($result, $record->getResult());
     }
 
-    $data = $this->_conditionedMerge($data, $result);
+    // $data = $this->_conditionedMerge($data, $result);
 
     return new Record($data, $result);
   }

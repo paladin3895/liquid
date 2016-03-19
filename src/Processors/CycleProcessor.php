@@ -57,14 +57,16 @@ class CycleProcessor extends BaseProcessor implements ConfigurableInterface
 	{
     $record = $collection->merge();
     $record->fromHistory($this->node);
-    $record->memory['_number'] = isset($record->memory['_number']) ? (int)$record->memory['_number'] : 0;
-    if ($this->number > 0 && $record->memory['_number'] >= $this->number)
+    $recentNumber = (int)$record->getMemory('_number');
+
+    if ($this->number > 0 && $recentNumber >= $this->number) {
       return $record;
+    }
 
 		foreach ($this->policies as $policy) {
       $closure = $policy->compile()->bindTo($this);
       if (!$closure($record)) {
-        $record->status = false;
+        $record->setStatus(false);
         return $record;
       }
     }
@@ -73,8 +75,9 @@ class CycleProcessor extends BaseProcessor implements ConfigurableInterface
       $closure = $reward->compile()->bindTo($this);
       $record = $closure($record);
     }
-    $record->status = true;
-    $record->memory['_number'] += 1;
+
+    $record->setStatus(true);
+    $record->setMemory(['_number' => ++$recentNumber]);
     return $record;
 	}
 }

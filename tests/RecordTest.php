@@ -1,10 +1,11 @@
 <?php
+namespace Tests;
 
 use Liquid\Nodes\PolicyNode;
 use Liquid\Records\Record;
 use Liquid\Records\Collection;
 
-class RecordTest extends PHPUnit_Framework_TestCase
+class RecordTest extends TestCase
 {
     public function testCreateRecord()
     {

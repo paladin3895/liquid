@@ -31,8 +31,31 @@ class Expression
 
   public static function makeExpression($expression)
   {
-    return function (array $record) use ($expression) {
-      return (new ExpressionLanguage)->evaluate($expression, $record);
+    $parameters = [];
+    if (preg_match_all('#\$\{([a-zA-Z0-9\_]+)\}#', $expression, $matches)) {
+      $placeholders = $matches[0];
+      $parameters = $matches[1];
+    }
+
+    // prepare mapping for parameters with unique random key
+    // initialize collection of values
+    $mapping = [];
+    $collection = [];
+    foreach ($parameters as $index => $parameter) {
+      $key = str_shuffle(implode('', range('a', 'z')));
+      $mapping[$parameter] = $key;
+      $collection[$key] = 0;
+
+      $expression = str_replace($placeholders[$index], $mapping[$parameter], $expression);
+    }
+
+    return function (array $record) use ($expression, $mapping, $collection) {
+      foreach ($record as $key => $value) {
+        if (array_key_exists($key, $mapping)) {
+          $collection[$mapping[$key]] = $value;
+        }
+      }
+      return (new ExpressionLanguage)->evaluate($expression, $collection);
     };
   }
 }

@@ -66,14 +66,22 @@ class Record
     return (string)$this->label;
   }
 
-  public function getData()
+  public function getData($key = null)
   {
-    return (array)$this->data;
+    if ($key) {
+      return isset($this->data[$key]) ? $this->data[$key] : null;
+    } else {
+      return (array)$this->data;
+    }
   }
 
-  public function getResult()
+  public function getResult($key = null)
   {
-    return (array)$this->result;
+    if ($key) {
+      return isset($this->result[$key]) ? $this->result[$key] : null;
+    } else {
+      return (array)$this->result;
+    }
   }
 
   public function setResult(array $value)
@@ -81,14 +89,22 @@ class Record
     $this->result = $value;
   }
 
-  public function getHistory()
+  public function getHistory($key = null)
   {
-    return self::$history;
+    if ($key) {
+      return isset(self::$history[$key]) ? self::$history[$key] : null;
+    } else {
+      return (array)self::$history;
+    }
   }
 
-  public function getMemory()
+  public function getMemory($key = null)
   {
-    return (array)$this->memory;
+    if ($key) {
+      return isset($this->memory[$key]) ? $this->memory[$key] : null;
+    } else {
+      return (array)$this->memory;
+    }
   }
 
   public function setMemory(array $value)

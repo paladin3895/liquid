@@ -60,7 +60,7 @@ class AddValueReward extends BaseReward
       if (!isset($data[$attribute])) $data[$attribute] = 0;
       $old_value = $data[$attribute];
       $new_value = $computation($data);
-      $record->setResult($attribute, $new_value - $old_value);
+      $record->setResult([$attribute => $new_value - $old_value]);
       return $record;
     };
   }

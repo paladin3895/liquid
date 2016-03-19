@@ -1,4 +1,5 @@
 <?php
+namespace Tests;
 
 use Liquid\Nodes\PolicyNode;
 use Liquid\Processors\DummyProcessor;
@@ -6,9 +7,9 @@ use Liquid\Nodes\States\ActiveState;
 use Liquid\Registry;
 use Liquid\Records\Record;
 
-class NodeTest extends PHPUnit_Framework_TestCase
+class NodeTest extends TestCase
 {
-    public function testRegistryNode()
+    public function testNodeWithRegistry()
     {
         $registry = new Registry;
         $nodes = [];
@@ -55,7 +56,7 @@ class NodeTest extends PHPUnit_Framework_TestCase
         Record::forget();
     }
 
-    public function testProcessorNode()
+    public function testNodeWithProcessor()
     {
         $nodes[1] = new PolicyNode;
         $nodes[2] = new PolicyNode;

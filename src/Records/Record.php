@@ -58,6 +58,7 @@ class Record
     $this->label = 'record_' . uniqid();
     // reset status and memory
     $this->status = false;
+    $this->result = [];
     $this->memory = [];
   }
 

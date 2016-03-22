@@ -12,6 +12,31 @@ use Liquid\Processors\Units\Rewards\BaseReward;
 
 class ProcessorTest extends TestCase
 {
+    public function testPolicyWithNode()
+    {
+        $node_1 = new PolicyNode('testing_node_1');
+        $processor_1 = new PolicyProcessor;
+        $processor_1->registerPolicy(new DummyPolicy(true));
+        $processor_1->registerReward(new DummyReward(['point' => 10]));
+        $node_1->bind($processor_1);
+
+        $node_2 = new PolicyNode('testing_node_2');
+        $processor_2 = new PolicyProcessor;
+        $processor_2->registerPolicy(new DummyPolicy(false));
+        $processor_2->registerReward(new DummyReward(['point' => 30]));
+        $node_2->bind($processor_2);
+
+        $node_1->forward($node_2);
+        $node_1->change(new ActiveState);
+        $node_1->setInput(new Record(['name' => 'David Pham']));
+        $node_1->process();
+
+        $node_2->process();
+        $this->assertEquals(['point' => 10], Record::history('result'));
+        $this->assertTrue(Record::history('checkpoint')[$node_1->getName()]['status']);
+        $this->assertFalse(Record::history('checkpoint')[$node_2->getName()]['status']);
+    }
+
     public function testPolicyProcessorSuccess()
     {
         $node = new PolicyNode('testing_node');

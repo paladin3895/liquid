@@ -13,7 +13,9 @@ class PolicyNode extends BaseNode
 			$record = call_user_func($this->state->compileProcess()->bindTo($this), $this->collection);
       if ($record) {
         $record->toHistory($this);
-        if ($record->getStatus()) call_user_func($this->state->compilePush()->bindTo($this), $record);
+        if ($record->getStatus()) {
+          call_user_func($this->state->compilePush()->bindTo($this), $record);
+        }
       }
 		} else {
 			throw new \Exception('node ' . $this->name . ' doesnt have a processor');

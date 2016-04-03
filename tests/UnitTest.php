@@ -3,6 +3,8 @@ namespace Tests;
 
 use Liquid\Builders\PolicyBuilder;
 use Liquid\Processors\Units\Policies\CheckValuePolicy;
+use Liquid\Processors\Units\Policies\CheckValueIncrement;
+use Liquid\Processors\Units\Policies\CheckConsecutiveRepeat;
 use Liquid\Processors\Units\Rewards\AddValueReward;
 
 use Liquid\Records\Record;

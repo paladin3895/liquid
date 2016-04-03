@@ -14,8 +14,10 @@ class CheckValuePolicy extends BasePolicy
 	public static function getFormat()
   {
     return [
-      'attribute' => 'name',
+      'attribute' => 'field',
       'condition' => 'condition',
+      'name' => 'check_value',
+      'description' => 'check value of an attribute based on a predefined rule',
     ];
   }
 
@@ -26,16 +28,19 @@ class CheckValuePolicy extends BasePolicy
 	public static function validate(array $config)
   {
     $result = [];
+
+    $config['name'] = isset($config['name']) ? $config['name'] : 'check_policy';
+
     if (isset($config['attribute']) && is_scalar($config['attribute'])) {
       $result['attribute'] = $config['attribute'];
     } else {
-      throw new \Exception('invalid value for policy config: attribute');
+      throw new \Exception("invalid value for policy {$config['name']} config: attribute");
     }
 
     if (isset($config['condition']) && is_scalar($config['condition'])) {
       $result['condition'] = $config['condition'];
     } else {
-      throw new \Exception('invalid value for policy config: condition');
+      throw new \Exception("invalid value for policy {$config['name']} config: condition");
     }
 
     return $result;

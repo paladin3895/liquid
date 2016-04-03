@@ -84,9 +84,13 @@ class Record
     }
   }
 
-  public function setResult(array $value)
+  public function setResult($value, $key = null)
   {
-    $this->result = $value;
+    if ($key) {
+      $this->result[$key] = $value;
+    } else {
+      $this->result = (array)$value;
+    }
   }
 
   public function getHistory($key = null)
@@ -107,9 +111,13 @@ class Record
     }
   }
 
-  public function setMemory(array $value)
+  public function setMemory($value, $key = null)
   {
-    $this->memory = $value;
+    if ($key) {
+      $this->memory[$key] = $value;
+    } else {
+      $this->memory = (array)$value;
+    }
   }
 
   public function getStatus()

@@ -77,7 +77,7 @@ class CycleProcessor extends BaseProcessor implements ConfigurableInterface
     }
 
     $record->setStatus(true);
-    $record->setMemory(['_number' => ++$recentNumber]);
+    $record->setMemory(++$recentNumber, '_number');
     return $record;
 	}
 }

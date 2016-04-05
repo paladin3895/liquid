@@ -60,6 +60,7 @@ class CycleProcessor extends BaseProcessor implements ConfigurableInterface
     $recentNumber = (int)$record->getMemory('_number');
 
     if ($this->number > 0 && $recentNumber >= $this->number) {
+      $record->setResult([]);
       return $record;
     }
 
@@ -67,6 +68,7 @@ class CycleProcessor extends BaseProcessor implements ConfigurableInterface
       $closure = $policy->compile()->bindTo($this);
       if (!$closure($record)) {
         $record->setStatus(false);
+        $record->setResult([]);
         return $record;
       }
     }

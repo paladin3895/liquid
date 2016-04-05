@@ -54,7 +54,7 @@ class Schema
 		$nodes = [];
 		foreach ($config_nodes as $node) {
 				$policy = $this->builder->make($node);
-				$nodes[$node['id']] = $this->node->newInstance($node['id']);
+				$nodes[$node['id']] = $this->node->newInstance('node.' . $node['id']);
 				$nodes[$node['id']]->bind($policy);
 				$nodes[$node['id']]->register($registry);
 		}

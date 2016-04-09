@@ -155,6 +155,6 @@ class Record
         'memory' => $this->memory,
         'result' => $this->result,
     ];
-    self::$history['result'] = $this->_conditionedMerge(self::$history['result'], $this->result);
+    self::$history['result'] = $this->_conditionedMerge($this->result, self::$history['result']);
   }
 }

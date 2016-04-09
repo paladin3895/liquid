@@ -45,6 +45,14 @@ class Record
     }
   }
 
+  public static function remember(array $checkpoint)
+  {
+    self::$history = [
+      'result' => [],
+      'checkpoint' => $checkpoint,
+    ];
+  }
+
   public static function forget()
   {
     self::$history = [
